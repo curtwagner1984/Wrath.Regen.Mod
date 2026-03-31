@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <RootNamespace>WrathRegenMod</RootNamespace>
+    <AssemblyName>Wrath.Regen.Mod</AssemblyName>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>bin\</OutputPath>
+    <WrathGameDir Condition="'$(WrathGameDir)' == ''">C:\Path\To\Pathfinder Second Adventure</WrathGameDir>
+    <WrathManagedDir Condition="'$(WrathManagedDir)' == ''">$(WrathGameDir)\Wrath_Data\Managed</WrathManagedDir>
+    <WrathModsDir Condition="'$(WrathModsDir)' == ''">$(WrathGameDir)\Mods\Wrath.Regen.Mod</WrathModsDir>
+    <WrathGameDirPlaceholder>C:\Path\To\Pathfinder Second Adventure</WrathGameDirPlaceholder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(WrathManagedDir)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(WrathManagedDir)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityModManager">
+      <HintPath>$(WrathManagedDir)\UnityModManager\UnityModManager.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(WrathManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(WrathManagedDir)\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Info.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="ValidateWrathPaths" BeforeTargets="ResolveReferences">
+    <Error
+      Condition="'$(WrathGameDir)' == '$(WrathGameDirPlaceholder)'"
+      Text="Set WrathGameDir in Wrath.Regen.Mod.csproj to your real Pathfinder: Wrath of the Righteous install folder before building." />
+    <Error
+      Condition="!Exists('$(WrathManagedDir)\Assembly-CSharp.dll')"
+      Text="Could not find $(WrathManagedDir)\Assembly-CSharp.dll. Check WrathGameDir/WrathManagedDir." />
+    <Error
+      Condition="!Exists('$(WrathManagedDir)\0Harmony.dll')"
+      Text="Could not find $(WrathManagedDir)\0Harmony.dll. Check WrathGameDir/WrathManagedDir." />
+    <Error
+      Condition="!Exists('$(WrathManagedDir)\UnityModManager\UnityModManager.dll')"
+      Text="Could not find $(WrathManagedDir)\UnityModManager\UnityModManager.dll. Check WrathGameDir/WrathManagedDir." />
+  </Target>
+
+  <Target Name="DeployToWrathMods" AfterTargets="Build" Condition="'$(WrathGameDir)' != '$(WrathGameDirPlaceholder)'">
+    <MakeDir Directories="$(WrathModsDir)" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(WrathModsDir)" />
+    <Copy SourceFiles="Info.json" DestinationFolder="$(WrathModsDir)" />
+  </Target>
+</Project>

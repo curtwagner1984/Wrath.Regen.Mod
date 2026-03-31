@@ -1,0 +1,12 @@
+{
+  "Id": "Wrath.Regen.Mod",
+  "DisplayName": "Wrath Regen Mod",
+  "Author": "mihae",
+  "Version": "0.1.0",
+  "ManagerVersion": "0.27.0",
+  "Requirements": [],
+  "AssemblyName": "Wrath.Regen.Mod.dll",
+  "EntryMethod": "WrathRegenMod.Main.Load",
+  "HomePage": "",
+  "Repository": ""
+}
