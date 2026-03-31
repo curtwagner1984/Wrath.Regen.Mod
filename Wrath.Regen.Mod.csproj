@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -9,7 +9,7 @@
     <AssemblyName>Wrath.Regen.Mod</AssemblyName>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin\</OutputPath>
-    <WrathGameDir Condition="'$(WrathGameDir)' == ''">C:\Path\To\Pathfinder Second Adventure</WrathGameDir>
+    <WrathGameDir Condition="'$(WrathGameDir)' == ''">D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure</WrathGameDir>
     <WrathManagedDir Condition="'$(WrathManagedDir)' == ''">$(WrathGameDir)\Wrath_Data\Managed</WrathManagedDir>
     <WrathModsDir Condition="'$(WrathModsDir)' == ''">$(WrathGameDir)\Mods\Wrath.Regen.Mod</WrathModsDir>
     <WrathGameDirPlaceholder>C:\Path\To\Pathfinder Second Adventure</WrathGameDirPlaceholder>
@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>$(WrathManagedDir)\0Harmony.dll</HintPath>
+      <HintPath>$(WrathManagedDir)\UnityModManager\0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
@@ -52,8 +52,8 @@
       Condition="!Exists('$(WrathManagedDir)\Assembly-CSharp.dll')"
       Text="Could not find $(WrathManagedDir)\Assembly-CSharp.dll. Check WrathGameDir/WrathManagedDir." />
     <Error
-      Condition="!Exists('$(WrathManagedDir)\0Harmony.dll')"
-      Text="Could not find $(WrathManagedDir)\0Harmony.dll. Check WrathGameDir/WrathManagedDir." />
+      Condition="!Exists('$(WrathManagedDir)\UnityModManager\0Harmony.dll')"
+      Text="Could not find $(WrathManagedDir)\UnityModManager\0Harmony.dll. Check WrathGameDir/WrathManagedDir." />
     <Error
       Condition="!Exists('$(WrathManagedDir)\UnityModManager\UnityModManager.dll')"
       Text="Could not find $(WrathManagedDir)\UnityModManager\UnityModManager.dll. Check WrathGameDir/WrathManagedDir." />
