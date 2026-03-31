@@ -17,14 +17,14 @@ internal static class HealthRegenController
 
     public static void Tick(ModLogger logger, ModSettings settings, float deltaTime)
     {
-        if (!settings.EnableHealthRegenPrototype)
+        if (!settings.HealthRegen.Enabled)
         {
             return;
         }
 
         if (!loggedReadyMessage)
         {
-            logger.Log("HealthRegenController is running. Prototype healing uses Wrath's built-in RuleHealDamage flow.");
+            logger.Info("HealthRegenController is running. Prototype healing uses Wrath's built-in rule system.");
             loggedReadyMessage = true;
         }
 
@@ -34,14 +34,14 @@ internal static class HealthRegenController
         }
 
         elapsedSeconds += deltaTime;
-        if (elapsedSeconds < settings.TickIntervalSeconds)
+        if (elapsedSeconds < settings.HealthRegen.TickIntervalSeconds)
         {
             return;
         }
 
         elapsedSeconds = 0f;
 
-        if (settings.OnlyRegenOutOfCombat && Game.Instance.Player.IsInCombat)
+        if (settings.HealthRegen.OnlyRegenOutOfCombat && Game.Instance.Player.IsInCombat)
         {
             logger.Verbose("Health prototype skipped because the party is in combat.");
             return;
@@ -78,6 +78,7 @@ internal static class HealthRegenController
     {
         if (unit == null || unit.State == null || unit.Descriptor == null)
         {
+            logger.Error("Health regen encountered a unit with missing state or descriptor.");
             return false;
         }
 
@@ -98,10 +99,10 @@ internal static class HealthRegenController
             return RestoreUndead(logger, settings, unit, name, missingHp);
         }
 
-        var healAmount = Math.Min(settings.HealthRegenAmountPerTick, missingHp);
+        var healAmount = Math.Min(settings.HealthRegen.HealthPerTick, missingHp);
         var healRule = new RuleHealDamage(unit, unit, healAmount)
         {
-            DisableBattleLogSelf = !settings.ShowHealingInGameLog
+            DisableBattleLogSelf = !settings.HealthRegen.ShowHealingInGameLog
         };
 
         Rulebook.Trigger(healRule);
@@ -112,17 +113,17 @@ internal static class HealthRegenController
             return false;
         }
 
-        logger.Log($"Health prototype restored {healRule.Value} HP to {name}.");
+        logger.Info($"Health prototype restored {healRule.Value} HP to {name}.");
         return true;
     }
 
     private static bool RestoreUndead(ModLogger logger, ModSettings settings, UnitEntityData unit, string name, int missingHp)
     {
-        var restoreAmount = Math.Min(settings.HealthRegenAmountPerTick, missingHp);
+        var restoreAmount = Math.Min(settings.HealthRegen.HealthPerTick, missingHp);
         var damage = new EnergyDamage(DiceFormula.Zero, restoreAmount, DamageEnergyType.NegativeEnergy);
         var rule = new RuleDealDamage(unit, unit, damage)
         {
-            DisableBattleLogSelf = !settings.ShowHealingInGameLog
+            DisableBattleLogSelf = !settings.HealthRegen.ShowHealingInGameLog
         };
 
         Rulebook.Trigger(rule);
@@ -134,14 +135,14 @@ internal static class HealthRegenController
             return false;
         }
 
-        logger.Log($"Health prototype restored {restored} HP to undead unit {name} via negative energy.");
+        logger.Info($"Health prototype restored {restored} HP to undead unit {name} via negative energy.");
         return true;
     }
 
     private static IEnumerable<UnitEntityData> GetConfiguredTargets(ModSettings settings)
     {
         var seen = new HashSet<string>(StringComparer.Ordinal);
-        var baseTargets = settings.IncludePetsInHealthRegen
+        var baseTargets = settings.HealthRegen.IncludePets
             ? Game.Instance.Player.PartyAndPets
             : Game.Instance.Player.Party;
 
@@ -153,7 +154,7 @@ internal static class HealthRegenController
             }
         }
 
-        if (!settings.IncludeSummonsInHealthRegen)
+        if (!settings.HealthRegen.IncludeSummons)
         {
             yield break;
         }

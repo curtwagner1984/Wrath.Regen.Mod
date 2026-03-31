@@ -11,14 +11,14 @@ internal static class PartyProbeController
 
     public static void Tick(ModLogger logger, ModSettings settings, float deltaTime)
     {
-        if (!settings.EnablePartyDiagnostics)
+        if (!settings.Diagnostics.EnablePartyDiagnostics)
         {
             return;
         }
 
         if (!loggedReadyMessage)
         {
-            logger.Log("PartyProbeController is running. Logging party HP and combat state on each interval.");
+            logger.Info("PartyProbeController is running.");
             loggedReadyMessage = true;
         }
 
@@ -26,7 +26,7 @@ internal static class PartyProbeController
         {
             if (!loggedMissingGameMessage)
             {
-                logger.Log("Game instance or player data is not ready yet.");
+                logger.Verbose("Diagnostics skipped because game instance or player data is not ready yet.");
                 loggedMissingGameMessage = true;
             }
 
@@ -35,7 +35,7 @@ internal static class PartyProbeController
 
         loggedMissingGameMessage = false;
         elapsedSeconds += deltaTime;
-        if (elapsedSeconds < settings.TickIntervalSeconds)
+        if (elapsedSeconds < settings.Diagnostics.TickIntervalSeconds)
         {
             return;
         }
@@ -49,13 +49,13 @@ internal static class PartyProbeController
         var party = Game.Instance.Player.Party;
         if (party == null)
         {
-            logger.Log("Party list is null.");
+            logger.Error("Diagnostics could not read the party list because it was null.");
             return;
         }
 
-        logger.Log($"Party snapshot: {party.Count} unit(s).");
+        logger.Verbose($"Party snapshot: {party.Count} unit(s).");
 
-        if (!settings.LogVerbose)
+        if (!settings.Diagnostics.LogVerbose)
         {
             return;
         }
@@ -70,7 +70,7 @@ internal static class PartyProbeController
     {
         if (unit == null)
         {
-            logger.Log("Party member entry was null.");
+            logger.Error("Diagnostics encountered a null party member entry.");
             return;
         }
 
@@ -82,7 +82,7 @@ internal static class PartyProbeController
         var isUndead = unit.Descriptor?.IsUndead ?? false;
         var name = string.IsNullOrWhiteSpace(unit.CharacterName) ? "<unnamed>" : unit.CharacterName;
 
-        logger.Log(
+        logger.Verbose(
             $"Party unit: {name} | HP {currentHp}/{maxHp} | InCombat={inCombat} | Dead={isDead} | Unconscious={isUnconscious} | Undead={isUndead}");
     }
 }
