@@ -46,11 +46,47 @@ public static class Main
             settings.Enabled,
             "Enable experimental regeneration controller");
 
+        UnityEngine.GUILayout.Space(8f);
+        UnityEngine.GUILayout.Label("Diagnostics");
+
+        settings.EnablePartyDiagnostics = UnityEngine.GUILayout.Toggle(
+            settings.EnablePartyDiagnostics,
+            "Enable party diagnostics probe");
+
         settings.LogVerbose = UnityEngine.GUILayout.Toggle(
             settings.LogVerbose,
             "Verbose logging");
 
-        UnityEngine.GUILayout.Label("This scaffold is intentionally tiny. Confirm loading first, then add game logic.");
+        settings.MirrorModLogsToGameLog = UnityEngine.GUILayout.Toggle(
+            settings.MirrorModLogsToGameLog,
+            "Mirror mod messages to the in-game event log");
+
+        UnityEngine.GUILayout.Space(8f);
+        UnityEngine.GUILayout.Label("Health Prototype");
+
+        settings.EnableHealthRegenPrototype = UnityEngine.GUILayout.Toggle(
+            settings.EnableHealthRegenPrototype,
+            "Enable health regeneration prototype");
+
+        settings.OnlyRegenOutOfCombat = UnityEngine.GUILayout.Toggle(
+            settings.OnlyRegenOutOfCombat,
+            "Only regenerate out of combat");
+
+        settings.ShowHealingInGameLog = UnityEngine.GUILayout.Toggle(
+            settings.ShowHealingInGameLog,
+            "Show prototype healing in the in-game event log");
+
+        UnityEngine.GUILayout.Label($"Tick interval: {settings.TickIntervalSeconds:0.0} seconds");
+        settings.TickIntervalSeconds = (float)System.Math.Round(
+            UnityEngine.GUILayout.HorizontalSlider(settings.TickIntervalSeconds, 1f, 30f),
+            1);
+
+        UnityEngine.GUILayout.Label($"Health restored per tick: {settings.HealthRegenAmountPerTick}");
+        settings.HealthRegenAmountPerTick = UnityEngine.Mathf.RoundToInt(
+            UnityEngine.GUILayout.HorizontalSlider(settings.HealthRegenAmountPerTick, 1f, 10f));
+
+        UnityEngine.GUILayout.Space(8f);
+        UnityEngine.GUILayout.Label("Health regen uses Wrath's built-in healing rule. Undead are intentionally skipped for now so the prototype cannot hurt them.");
     }
 
     private static void OnSaveGUI(UnityModManager.ModEntry entry)
@@ -65,6 +101,8 @@ public static class Main
             return;
         }
 
-        RegenController.Tick(entry, settings, deltaTime);
+        var logger = new ModLogger(entry, settings);
+        PartyProbeController.Tick(logger, settings, deltaTime);
+        HealthRegenController.Tick(logger, settings, deltaTime);
     }
 }
