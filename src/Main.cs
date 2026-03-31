@@ -72,6 +72,14 @@ public static class Main
             settings.OnlyRegenOutOfCombat,
             "Only regenerate out of combat");
 
+        settings.IncludePetsInHealthRegen = UnityEngine.GUILayout.Toggle(
+            settings.IncludePetsInHealthRegen,
+            "Include pets in health regeneration");
+
+        settings.IncludeSummonsInHealthRegen = UnityEngine.GUILayout.Toggle(
+            settings.IncludeSummonsInHealthRegen,
+            "Include summons in health regeneration");
+
         settings.ShowHealingInGameLog = UnityEngine.GUILayout.Toggle(
             settings.ShowHealingInGameLog,
             "Show prototype healing in the in-game event log");
@@ -86,7 +94,7 @@ public static class Main
             UnityEngine.GUILayout.HorizontalSlider(settings.HealthRegenAmountPerTick, 1f, 10f));
 
         UnityEngine.GUILayout.Space(8f);
-        UnityEngine.GUILayout.Label("Health regen uses Wrath's built-in healing rule. Undead are intentionally skipped for now so the prototype cannot hurt them.");
+        UnityEngine.GUILayout.Label("Health regen uses Wrath's built-in healing and damage rules. Living units receive healing; undead use the negative-energy path.");
     }
 
     private static void OnSaveGUI(UnityModManager.ModEntry entry)

@@ -8,6 +8,8 @@ public sealed class ModSettings : UnityModManager.ModSettings
     public bool EnablePartyDiagnostics = true;
     public bool EnableHealthRegenPrototype = false;
     public bool OnlyRegenOutOfCombat = true;
+    public bool IncludePetsInHealthRegen = true;
+    public bool IncludeSummonsInHealthRegen = false;
     public bool LogVerbose = false;
     public bool MirrorModLogsToGameLog = false;
     public bool ShowHealingInGameLog = true;

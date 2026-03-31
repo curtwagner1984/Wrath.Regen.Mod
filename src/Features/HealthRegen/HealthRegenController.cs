@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.Enums.Damage;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules.Damage;
+using Kingmaker.UnitLogic.Parts;
 
 namespace WrathRegenMod;
 
 internal static class HealthRegenController
 {
-    private static readonly HashSet<string> ReportedUndeadUnits = new HashSet<string>();
-
     private static float elapsedSeconds;
     private static bool loggedReadyMessage;
 
@@ -51,15 +52,15 @@ internal static class HealthRegenController
 
     private static void RunPartyHealingTick(ModLogger logger, ModSettings settings)
     {
-        var party = Game.Instance.Player.Party;
-        if (party == null || party.Count == 0)
+        var targets = GetConfiguredTargets(settings).ToList();
+        if (targets.Count == 0)
         {
-            logger.Verbose("Health prototype skipped because no party units were available.");
+            logger.Verbose("Health prototype skipped because no eligible units were available.");
             return;
         }
 
         var healedUnits = 0;
-        foreach (var unit in party)
+        foreach (var unit in targets)
         {
             if (TryHealUnit(logger, settings, unit))
             {
@@ -86,20 +87,15 @@ internal static class HealthRegenController
         }
 
         var name = string.IsNullOrWhiteSpace(unit.CharacterName) ? "<unnamed>" : unit.CharacterName;
-        if (unit.Descriptor.IsUndead)
-        {
-            if (ReportedUndeadUnits.Add(unit.UniqueId))
-            {
-                logger.Log($"Health prototype skipped undead unit {name}. Positive-energy healing would be unsafe here until we add the correct undead restoration path.");
-            }
-
-            return false;
-        }
-
         var missingHp = unit.Damage;
         if (missingHp <= 0)
         {
             return false;
+        }
+
+        if (unit.Descriptor.IsUndead)
+        {
+            return RestoreUndead(logger, settings, unit, name, missingHp);
         }
 
         var healAmount = Math.Min(settings.HealthRegenAmountPerTick, missingHp);
@@ -118,5 +114,82 @@ internal static class HealthRegenController
 
         logger.Log($"Health prototype restored {healRule.Value} HP to {name}.");
         return true;
+    }
+
+    private static bool RestoreUndead(ModLogger logger, ModSettings settings, UnitEntityData unit, string name, int missingHp)
+    {
+        var restoreAmount = Math.Min(settings.HealthRegenAmountPerTick, missingHp);
+        var damage = new EnergyDamage(DiceFormula.Zero, restoreAmount, DamageEnergyType.NegativeEnergy);
+        var rule = new RuleDealDamage(unit, unit, damage)
+        {
+            DisableBattleLogSelf = !settings.ShowHealingInGameLog
+        };
+
+        Rulebook.Trigger(rule);
+
+        var restored = Math.Max(0, missingHp - unit.Damage);
+        if (restored <= 0)
+        {
+            logger.Verbose($"Health prototype attempted undead restoration on {name}, but no HP was restored.");
+            return false;
+        }
+
+        logger.Log($"Health prototype restored {restored} HP to undead unit {name} via negative energy.");
+        return true;
+    }
+
+    private static IEnumerable<UnitEntityData> GetConfiguredTargets(ModSettings settings)
+    {
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var baseTargets = settings.IncludePetsInHealthRegen
+            ? Game.Instance.Player.PartyAndPets
+            : Game.Instance.Player.Party;
+
+        foreach (var unit in baseTargets)
+        {
+            if (ShouldInclude(unit) && seen.Add(unit.UniqueId))
+            {
+                yield return unit;
+            }
+        }
+
+        if (!settings.IncludeSummonsInHealthRegen)
+        {
+            yield break;
+        }
+
+        foreach (var unit in Game.Instance.Player.AllCrossSceneUnits)
+        {
+            if (ShouldIncludeSummon(unit) && seen.Add(unit.UniqueId))
+            {
+                yield return unit;
+            }
+        }
+    }
+
+    private static bool ShouldInclude(UnitEntityData unit)
+    {
+        if (unit == null || !unit.IsInGame || unit.Suppressed || unit.IsDetached)
+        {
+            return false;
+        }
+
+        return unit.IsPlayerFaction;
+    }
+
+    private static bool ShouldIncludeSummon(UnitEntityData unit)
+    {
+        if (!ShouldInclude(unit) || unit.IsPet)
+        {
+            return false;
+        }
+
+        var summonedMonster = unit.Get<UnitPartSummonedMonster>();
+        if (summonedMonster == null)
+        {
+            return false;
+        }
+
+        return summonedMonster.Summoner?.IsPlayerFaction ?? false;
     }
 }

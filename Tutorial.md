@@ -234,13 +234,49 @@ That means:
 - normal positive-energy healing is not safe for undead
 - if we blindly used `RuleHealDamage` on an undead target, the prototype could hurt them
 
-For now, the health prototype explicitly checks:
+The prototype now checks:
 
 - `UnitDescriptor.IsUndead`
 
-and skips undead targets until we add the correct undead restoration path.
+and routes undead restoration through:
 
-This keeps the prototype safe while we continue investigating how Wrath models negative-energy healing for undead.
+- `RuleDealDamage`
+- `EnergyDamage`
+- `DamageEnergyType.NegativeEnergy`
+
+This follows the game's own damage/healing pipeline instead of mutating HP directly.
+
+We also found a useful supporting system in:
+
+- `AddEnergyDamageImmunity`
+
+which can convert incoming energy damage into healing through `HealOnDamage`.
+
+That makes the negative-energy path a reasonable prototype for undead restoration.
+
+## Pets And Summons
+
+We confirmed that pets are represented separately from the core party list.
+
+Relevant APIs:
+
+- `Player.Party`
+- `Player.PartyAndPets`
+- `UnitEntityData.IsPet`
+- `UnitEntityData.Master`
+
+So pet support should come from `PartyAndPets`, not by guessing ownership manually.
+
+For summons, a useful marker is:
+
+- `UnitPartSummonedMonster`
+
+The current prototype includes separate configuration toggles for:
+
+- pets
+- summons
+
+with summons discovered from `Player.AllCrossSceneUnits` and filtered to player-side active summoned units.
 
 ## In-Game Log Integration
 
