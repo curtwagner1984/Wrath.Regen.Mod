@@ -1205,3 +1205,56 @@ At this point, the architecture feels much less mysterious:
 - runtime capability detection first
 - subsystem-specific restore policy second
 - class-specific exceptions third
+
+## First implementation slice
+
+The first real resource-regeneration implementation now exists in code.
+
+Scope:
+
+- separate `Resource Regen` settings tab
+- dedicated `ResourceRegenController`
+- first strategy: spontaneous spellbook regeneration
+- current target shape: Oracle-style spontaneous spellbooks
+- current write path: `Spellbook.RestoreSpontaneousSlots(level, 1)`
+
+Files:
+
+- `src/Features/ResourceRegen/ResourceRegenController.cs`
+- `src/Features/ResourceRegen/Strategies/SpontaneousSpellbookRegenStrategy.cs`
+- `src/Features/ResourceRegen/Models/RegenTickContext.cs`
+
+Current behavior:
+
+- scans party members on a configurable controller tick
+- skips while in combat if configured
+- inspects each unit's spellbooks
+- only acts on spellbooks whose blueprint is `Spontaneous`
+- tracks separate timers per:
+  - unit
+  - spellbook instance
+  - spell level
+- restores one slot when that level's timer completes and the spellbook is below max slots for that level
+
+Settings model:
+
+- controller on/off
+- out-of-combat only toggle
+- spontaneous spellbook strategy on/off
+- controller scan interval
+- per-spell-level restore interval for levels 1 through 9
+- setting a level interval to `0` disables regeneration for that spell level
+
+Logging model:
+
+- `Info`:
+  - controller startup
+  - successful spell-slot restoration
+- `Verbose`:
+  - in-combat skips
+  - failed restore attempt where the spellbook state did not change
+- `Error`:
+  - unexpected null descriptor state
+  - per-strategy exceptions
+
+This is intentionally still a narrow slice. Prepared spellbooks, generic ability resources, and special systems like kineticist burn should be added as separate strategies rather than folded into this first one.
