@@ -87,6 +87,7 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
                 continue;
             }
 
+            ResourceRegenFxPlayer.TryPlayOnUnit(context.Logger, context.Settings, unit);
             context.Logger.Info(
                 $"{Name} restored {restoredSlots} level {spellLevel} slot for {GetUnitName(unit)} ({beforeRestore}/{maxSlots} -> {afterRestore}/{maxSlots}).");
             elapsedByKey[timerKey] = 0f;

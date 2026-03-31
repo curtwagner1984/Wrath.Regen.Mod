@@ -29,6 +29,12 @@ internal static class SettingsRenderer
         "Verbose"
     };
 
+    private static readonly string[] ResourceRegenVisualEffectLabels =
+    {
+        "Divine Refresh",
+        "Arcane Refresh"
+    };
+
     private static SettingsTab currentTab;
     private static string diagnosticsTickIntervalText;
     private static string healthTickIntervalText;
@@ -178,6 +184,17 @@ internal static class SettingsRenderer
             "Enable spontaneous spellbook regeneration",
             "Restores one spontaneous spell slot at configured levels when the timer for that level completes.");
 
+        settings.ResourceRegen.ShowVisualEffects = Toggle(
+            settings.ResourceRegen.ShowVisualEffects,
+            "Show visual effects when resources regenerate",
+            "Plays a short built-in visual effect on the unit after a spell slot is restored. This applies only to resource regeneration, not health regeneration.");
+
+        settings.ResourceRegen.VisualEffectStyle = ResourceRegenVisualEffectSelection(
+            "Visual effect style",
+            settings.ResourceRegen.VisualEffectStyle,
+            ResourceRegenVisualEffectLabels,
+            "Chooses which built-in spell-style effect to reuse for resource regeneration. Divine Refresh is the recommended subtle default.");
+
         settings.ResourceRegen.TickIntervalSeconds = FloatField(
             "Controller tick interval (seconds)",
             resourceTickIntervalText,
@@ -254,6 +271,19 @@ internal static class SettingsRenderer
         {
             GUILayout.Label(new GUIContent(label, tooltip), GUILayout.Width(240f));
             return (LogLevel)GUILayout.Toolbar((int)value, labels, GUILayout.MinWidth(240f));
+        }
+    }
+
+    private static ResourceRegenVisualEffectStyle ResourceRegenVisualEffectSelection(
+        string label,
+        ResourceRegenVisualEffectStyle value,
+        string[] labels,
+        string tooltip)
+    {
+        using (new GUILayout.HorizontalScope())
+        {
+            GUILayout.Label(new GUIContent(label, tooltip), GUILayout.Width(240f));
+            return (ResourceRegenVisualEffectStyle)GUILayout.Toolbar((int)value, labels, GUILayout.MinWidth(240f));
         }
     }
 

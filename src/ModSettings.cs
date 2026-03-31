@@ -49,6 +49,8 @@ public sealed class ResourceRegenSettings
     public bool OnlyRegenOutOfCombat = true;
     public float TickIntervalSeconds = 1.0f;
     public bool EnableSpontaneousSpellbookRegen = true;
+    public bool ShowVisualEffects = true;
+    public ResourceRegenVisualEffectStyle VisualEffectStyle = ResourceRegenVisualEffectStyle.DivineRefresh;
     public float Level1IntervalSeconds = 30.0f;
     public float Level2IntervalSeconds = 40.0f;
     public float Level3IntervalSeconds = 50.0f;
@@ -85,6 +87,12 @@ public sealed class ResourceRegenSettings
                 return 0f;
         }
     }
+}
+
+public enum ResourceRegenVisualEffectStyle
+{
+    DivineRefresh = 0,
+    ArcaneRefresh = 1
 }
 
 public enum LogLevel

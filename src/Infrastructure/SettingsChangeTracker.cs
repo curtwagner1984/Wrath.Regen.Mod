@@ -20,6 +20,8 @@ internal sealed class SettingsSnapshot
     public bool ResourceRegenOutOfCombatOnly;
     public float ResourceRegenTickIntervalSeconds;
     public bool ResourceRegenEnableSpontaneousSpellbookRegen;
+    public bool ResourceRegenShowVisualEffects;
+    public ResourceRegenVisualEffectStyle ResourceRegenVisualEffectStyle;
     public float ResourceRegenLevel1IntervalSeconds;
     public float ResourceRegenLevel2IntervalSeconds;
     public float ResourceRegenLevel3IntervalSeconds;
@@ -50,6 +52,8 @@ internal sealed class SettingsSnapshot
             ResourceRegenOutOfCombatOnly = settings.ResourceRegen.OnlyRegenOutOfCombat,
             ResourceRegenTickIntervalSeconds = settings.ResourceRegen.TickIntervalSeconds,
             ResourceRegenEnableSpontaneousSpellbookRegen = settings.ResourceRegen.EnableSpontaneousSpellbookRegen,
+            ResourceRegenShowVisualEffects = settings.ResourceRegen.ShowVisualEffects,
+            ResourceRegenVisualEffectStyle = settings.ResourceRegen.VisualEffectStyle,
             ResourceRegenLevel1IntervalSeconds = settings.ResourceRegen.Level1IntervalSeconds,
             ResourceRegenLevel2IntervalSeconds = settings.ResourceRegen.Level2IntervalSeconds,
             ResourceRegenLevel3IntervalSeconds = settings.ResourceRegen.Level3IntervalSeconds,
@@ -147,6 +151,16 @@ internal sealed class SettingsSnapshot
         if (ResourceRegenEnableSpontaneousSpellbookRegen != previous.ResourceRegenEnableSpontaneousSpellbookRegen)
         {
             yield return $"ResourceRegen.EnableSpontaneousSpellbookRegen: {previous.ResourceRegenEnableSpontaneousSpellbookRegen} -> {ResourceRegenEnableSpontaneousSpellbookRegen}";
+        }
+
+        if (ResourceRegenShowVisualEffects != previous.ResourceRegenShowVisualEffects)
+        {
+            yield return $"ResourceRegen.ShowVisualEffects: {previous.ResourceRegenShowVisualEffects} -> {ResourceRegenShowVisualEffects}";
+        }
+
+        if (ResourceRegenVisualEffectStyle != previous.ResourceRegenVisualEffectStyle)
+        {
+            yield return $"ResourceRegen.VisualEffectStyle: {previous.ResourceRegenVisualEffectStyle} -> {ResourceRegenVisualEffectStyle}";
         }
 
         if (ResourceRegenLevel1IntervalSeconds != previous.ResourceRegenLevel1IntervalSeconds)
