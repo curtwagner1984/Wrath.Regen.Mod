@@ -1,19 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UnitLogic;
 
 namespace WrathRegenMod;
 
-internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
+internal sealed class PreparedSpellbookRegenStrategy : IResourceRegenStrategy
 {
     private readonly Dictionary<string, float> elapsedByKey = new Dictionary<string, float>(StringComparer.Ordinal);
 
-    public string Name => "SpontaneousSpellbookRegen";
+    public string Name => "PreparedSpellbookRegen";
 
     public void Tick(UnitEntityData unit, RegenTickContext context)
     {
-        if (!context.Settings.ResourceRegen.EnableSpontaneousSpellbookRegen)
+        if (!context.Settings.ResourceRegen.EnablePreparedSpellbookRegen)
         {
             return;
         }
@@ -32,7 +33,7 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
 
         foreach (var spellbook in spellbooks)
         {
-            if (spellbook == null || spellbook.Blueprint == null || !spellbook.Blueprint.Spontaneous)
+            if (spellbook?.Blueprint == null || !spellbook.Blueprint.MemorizeSpells)
             {
                 continue;
             }
@@ -51,14 +52,17 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
                 continue;
             }
 
-            var maxSlots = spellbook.GetSpellsPerDay(spellLevel);
-            if (maxSlots <= 0)
+            var memorizedSlots = spellbook.GetMemorizedSpellSlots(spellLevel)
+                .Where(slot => slot?.SpellShell != null)
+                .OrderBy(slot => slot.Index)
+                .ToList();
+            if (memorizedSlots.Count == 0)
             {
                 continue;
             }
 
-            var availableSlots = spellbook.GetSpontaneousSlots(spellLevel);
-            if (availableSlots >= maxSlots)
+            var spentSlots = memorizedSlots.Where(slot => !slot.Available).ToList();
+            if (spentSlots.Count == 0)
             {
                 ClearElapsed(unit, spellbook, spellLevel);
                 continue;
@@ -71,26 +75,42 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
             if (elapsedSeconds < intervalSeconds)
             {
                 elapsedByKey[timerKey] = elapsedSeconds;
+                context.Logger.Verbose(
+                    $"{Name} is waiting for level {spellLevel} on {ResourceRegenHelpers.GetUnitName(unit)} ({elapsedSeconds:0.##}/{intervalSeconds:0.##} seconds, {spentSlots.Count} spent prepared slot(s)).");
                 continue;
             }
 
-            var beforeRestore = availableSlots;
-            spellbook.RestoreSpontaneousSlots(spellLevel, 1);
-            var afterRestore = spellbook.GetSpontaneousSlots(spellLevel);
-            var restoredSlots = Math.Max(0, afterRestore - beforeRestore);
+            var chosenSlot = spentSlots[0];
+            var spellName = ResourceRegenHelpers.GetPreparedSpellName(chosenSlot);
+            var beforeAvailable = CountAvailableSlots(memorizedSlots);
+
+            chosenSlot.Available = true;
+            if (chosenSlot.SpellShell != null && spellbook.RemoveMemorizedSpells.Contains(chosenSlot.SpellShell))
+            {
+                spellbook.RemoveMemorizedSpells.Remove(chosenSlot.SpellShell);
+            }
+
+            var afterAvailable = CountAvailableSlots(memorizedSlots);
+            var restoredSlots = Math.Max(0, afterAvailable - beforeAvailable);
 
             if (restoredSlots <= 0)
             {
-                context.Logger.Verbose($"{Name} tried to restore a level {spellLevel} slot for {ResourceRegenHelpers.GetUnitName(unit)}, but the spellbook state did not change.");
+                context.Logger.Verbose(
+                    $"{Name} tried to restore level {spellLevel} slot #{chosenSlot.Index} ({spellName}) for {ResourceRegenHelpers.GetUnitName(unit)}, but the prepared spellbook state did not change.");
                 elapsedByKey[timerKey] = 0f;
                 continue;
             }
 
             ResourceRegenFxPlayer.TryPlayOnUnit(context.Logger, context.Settings, unit);
             context.Logger.Info(
-                $"{Name} restored {restoredSlots} level {spellLevel} slot for {ResourceRegenHelpers.GetUnitName(unit)} ({beforeRestore}/{maxSlots} -> {afterRestore}/{maxSlots}).");
+                $"{Name} restored level {spellLevel} slot #{chosenSlot.Index} ({spellName}) for {ResourceRegenHelpers.GetUnitName(unit)} ({beforeAvailable}/{memorizedSlots.Count} -> {afterAvailable}/{memorizedSlots.Count} available prepared slot(s)).");
             elapsedByKey[timerKey] = 0f;
         }
+    }
+
+    private static int CountAvailableSlots(List<SpellSlot> slots)
+    {
+        return slots.Count(slot => slot.Available);
     }
 
     private void ClearElapsed(UnitEntityData unit, Spellbook spellbook, int spellLevel)

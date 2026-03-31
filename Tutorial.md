@@ -1229,12 +1229,18 @@ Current behavior:
 - scans party members on a configurable controller tick
 - skips while in combat if configured
 - inspects each unit's spellbooks
-- only acts on spellbooks whose blueprint is `Spontaneous`
+- acts on:
+  - spontaneous spellbooks by restoring one slot at a spell level
+  - prepared spellbooks by restoring one spent prepared slot in slot order at a spell level
 - tracks separate timers per:
+  - strategy
   - unit
   - spellbook instance
   - spell level
-- restores one slot when that level's timer completes and the spellbook is below max slots for that level
+- for prepared spellbooks, the current policy is intentionally simple:
+  - choose the first spent prepared slot by slot index
+  - set `Available = true`
+  - remove that spell from `RemoveMemorizedSpells` if needed
 
 Settings model:
 
@@ -1257,4 +1263,4 @@ Logging model:
   - unexpected null descriptor state
   - per-strategy exceptions
 
-This is intentionally still a narrow slice. Prepared spellbooks, generic ability resources, and special systems like kineticist burn should be added as separate strategies rather than folded into this first one.
+This is intentionally still a narrow slice. Generic ability resources and special systems like kineticist burn should be added as separate strategies rather than folded into the spellbook strategies.

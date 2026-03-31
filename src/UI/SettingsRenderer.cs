@@ -184,6 +184,11 @@ internal static class SettingsRenderer
             "Enable spontaneous spellbook regeneration",
             "Restores one spontaneous spell slot at configured levels when the timer for that level completes.");
 
+        settings.ResourceRegen.EnablePreparedSpellbookRegen = Toggle(
+            settings.ResourceRegen.EnablePreparedSpellbookRegen,
+            "Enable prepared spellbook regeneration",
+            "Restores one spent prepared slot at configured levels when the timer for that level completes. The current policy restores slots in order.");
+
         settings.ResourceRegen.ShowVisualEffects = Toggle(
             settings.ResourceRegen.ShowVisualEffects,
             "Show visual effects when resources regenerate",
@@ -417,7 +422,7 @@ internal static class SettingsRenderer
             case SettingsTab.HealthRegen:
                 return "Health Regen contains the current gameplay prototype. This is the tab that controls party, pet, summon, and undead handling.";
             case SettingsTab.ResourceRegen:
-                return "Resource Regen contains the first spell-slot prototype. The current implementation targets spontaneous spellbooks and restores one slot when a configured per-level timer completes.";
+                return "Resource Regen contains the spell-slot prototype. It currently supports spontaneous spellbooks and ordered prepared-slot restoration, both driven by the same per-level timers.";
             default:
                 return string.Empty;
         }

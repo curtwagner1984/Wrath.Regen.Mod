@@ -49,6 +49,7 @@ public sealed class ResourceRegenSettings
     public bool OnlyRegenOutOfCombat = true;
     public float TickIntervalSeconds = 1.0f;
     public bool EnableSpontaneousSpellbookRegen = true;
+    public bool EnablePreparedSpellbookRegen = true;
     public bool ShowVisualEffects = true;
     public ResourceRegenVisualEffectStyle VisualEffectStyle = ResourceRegenVisualEffectStyle.DivineRefresh;
     public float Level1IntervalSeconds = 30.0f;

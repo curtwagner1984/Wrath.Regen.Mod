@@ -20,6 +20,7 @@ internal sealed class SettingsSnapshot
     public bool ResourceRegenOutOfCombatOnly;
     public float ResourceRegenTickIntervalSeconds;
     public bool ResourceRegenEnableSpontaneousSpellbookRegen;
+    public bool ResourceRegenEnablePreparedSpellbookRegen;
     public bool ResourceRegenShowVisualEffects;
     public ResourceRegenVisualEffectStyle ResourceRegenVisualEffectStyle;
     public float ResourceRegenLevel1IntervalSeconds;
@@ -52,6 +53,7 @@ internal sealed class SettingsSnapshot
             ResourceRegenOutOfCombatOnly = settings.ResourceRegen.OnlyRegenOutOfCombat,
             ResourceRegenTickIntervalSeconds = settings.ResourceRegen.TickIntervalSeconds,
             ResourceRegenEnableSpontaneousSpellbookRegen = settings.ResourceRegen.EnableSpontaneousSpellbookRegen,
+            ResourceRegenEnablePreparedSpellbookRegen = settings.ResourceRegen.EnablePreparedSpellbookRegen,
             ResourceRegenShowVisualEffects = settings.ResourceRegen.ShowVisualEffects,
             ResourceRegenVisualEffectStyle = settings.ResourceRegen.VisualEffectStyle,
             ResourceRegenLevel1IntervalSeconds = settings.ResourceRegen.Level1IntervalSeconds,
@@ -151,6 +153,11 @@ internal sealed class SettingsSnapshot
         if (ResourceRegenEnableSpontaneousSpellbookRegen != previous.ResourceRegenEnableSpontaneousSpellbookRegen)
         {
             yield return $"ResourceRegen.EnableSpontaneousSpellbookRegen: {previous.ResourceRegenEnableSpontaneousSpellbookRegen} -> {ResourceRegenEnableSpontaneousSpellbookRegen}";
+        }
+
+        if (ResourceRegenEnablePreparedSpellbookRegen != previous.ResourceRegenEnablePreparedSpellbookRegen)
+        {
+            yield return $"ResourceRegen.EnablePreparedSpellbookRegen: {previous.ResourceRegenEnablePreparedSpellbookRegen} -> {ResourceRegenEnablePreparedSpellbookRegen}";
         }
 
         if (ResourceRegenShowVisualEffects != previous.ResourceRegenShowVisualEffects)
