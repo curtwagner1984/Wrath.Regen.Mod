@@ -10,14 +10,16 @@ internal static class SettingsRenderer
     {
         General,
         Diagnostics,
-        HealthRegen
+        HealthRegen,
+        ResourceRegen
     }
 
     private static readonly string[] TabLabels =
     {
         "General",
         "Diagnostics",
-        "Health Regen"
+        "Health Regen",
+        "Resource Regen"
     };
 
     private static readonly string[] LogLevelLabels =
@@ -31,6 +33,16 @@ internal static class SettingsRenderer
     private static string diagnosticsTickIntervalText;
     private static string healthTickIntervalText;
     private static string healthPerTickText;
+    private static string resourceTickIntervalText;
+    private static string resourceLevel1IntervalText;
+    private static string resourceLevel2IntervalText;
+    private static string resourceLevel3IntervalText;
+    private static string resourceLevel4IntervalText;
+    private static string resourceLevel5IntervalText;
+    private static string resourceLevel6IntervalText;
+    private static string resourceLevel7IntervalText;
+    private static string resourceLevel8IntervalText;
+    private static string resourceLevel9IntervalText;
 
     public static void Draw(ModSettings settings)
     {
@@ -55,6 +67,9 @@ internal static class SettingsRenderer
                 break;
             case SettingsTab.HealthRegen:
                 DrawHealthRegenTab(settings);
+                break;
+            case SettingsTab.ResourceRegen:
+                DrawResourceRegenTab(settings);
                 break;
         }
 
@@ -144,6 +159,90 @@ internal static class SettingsRenderer
             "Flat HP restored per tick. Living targets use healing; undead use the negative-energy restoration path.");
     }
 
+    private static void DrawResourceRegenTab(ModSettings settings)
+    {
+        Section("Resource Prototype");
+
+        settings.ResourceRegen.Enabled = Toggle(
+            settings.ResourceRegen.Enabled,
+            "Enable resource regeneration prototype",
+            "Turns on the first resource regeneration controller. The current implementation targets spontaneous spellbooks like Oracle.");
+
+        settings.ResourceRegen.OnlyRegenOutOfCombat = Toggle(
+            settings.ResourceRegen.OnlyRegenOutOfCombat,
+            "Only regenerate out of combat",
+            "Prevents spell-slot restoration while the player party is flagged as being in combat.");
+
+        settings.ResourceRegen.EnableSpontaneousSpellbookRegen = Toggle(
+            settings.ResourceRegen.EnableSpontaneousSpellbookRegen,
+            "Enable spontaneous spellbook regeneration",
+            "Restores one spontaneous spell slot at configured levels when the timer for that level completes.");
+
+        settings.ResourceRegen.TickIntervalSeconds = FloatField(
+            "Controller tick interval (seconds)",
+            resourceTickIntervalText,
+            value => resourceTickIntervalText = value,
+            settings.ResourceRegen.TickIntervalSeconds,
+            0.1f,
+            60f,
+            "How often the resource controller scans party units. Allowed range: 0.1 to 60 seconds.");
+
+        DrawSpellLevelIntervalField(
+            settings,
+            1,
+            resourceLevel1IntervalText,
+            value => resourceLevel1IntervalText = value,
+            settings.ResourceRegen.Level1IntervalSeconds);
+        DrawSpellLevelIntervalField(
+            settings,
+            2,
+            resourceLevel2IntervalText,
+            value => resourceLevel2IntervalText = value,
+            settings.ResourceRegen.Level2IntervalSeconds);
+        DrawSpellLevelIntervalField(
+            settings,
+            3,
+            resourceLevel3IntervalText,
+            value => resourceLevel3IntervalText = value,
+            settings.ResourceRegen.Level3IntervalSeconds);
+        DrawSpellLevelIntervalField(
+            settings,
+            4,
+            resourceLevel4IntervalText,
+            value => resourceLevel4IntervalText = value,
+            settings.ResourceRegen.Level4IntervalSeconds);
+        DrawSpellLevelIntervalField(
+            settings,
+            5,
+            resourceLevel5IntervalText,
+            value => resourceLevel5IntervalText = value,
+            settings.ResourceRegen.Level5IntervalSeconds);
+        DrawSpellLevelIntervalField(
+            settings,
+            6,
+            resourceLevel6IntervalText,
+            value => resourceLevel6IntervalText = value,
+            settings.ResourceRegen.Level6IntervalSeconds);
+        DrawSpellLevelIntervalField(
+            settings,
+            7,
+            resourceLevel7IntervalText,
+            value => resourceLevel7IntervalText = value,
+            settings.ResourceRegen.Level7IntervalSeconds);
+        DrawSpellLevelIntervalField(
+            settings,
+            8,
+            resourceLevel8IntervalText,
+            value => resourceLevel8IntervalText = value,
+            settings.ResourceRegen.Level8IntervalSeconds);
+        DrawSpellLevelIntervalField(
+            settings,
+            9,
+            resourceLevel9IntervalText,
+            value => resourceLevel9IntervalText = value,
+            settings.ResourceRegen.Level9IntervalSeconds);
+    }
+
     private static bool Toggle(bool value, string label, string tooltip)
     {
         return GUILayout.Toggle(value, new GUIContent(label, tooltip));
@@ -216,6 +315,54 @@ internal static class SettingsRenderer
         return currentValue;
     }
 
+    private static void DrawSpellLevelIntervalField(
+        ModSettings settings,
+        int spellLevel,
+        string textValue,
+        Action<string> setTextValue,
+        float currentValue)
+    {
+        var updatedValue = FloatField(
+            $"Level {spellLevel} restore interval (seconds)",
+            textValue,
+            setTextValue,
+            currentValue,
+            0f,
+            3600f,
+            $"How long it takes to restore one level {spellLevel} spontaneous slot. Set to 0 to disable regeneration at this spell level.");
+
+        switch (spellLevel)
+        {
+            case 1:
+                settings.ResourceRegen.Level1IntervalSeconds = updatedValue;
+                break;
+            case 2:
+                settings.ResourceRegen.Level2IntervalSeconds = updatedValue;
+                break;
+            case 3:
+                settings.ResourceRegen.Level3IntervalSeconds = updatedValue;
+                break;
+            case 4:
+                settings.ResourceRegen.Level4IntervalSeconds = updatedValue;
+                break;
+            case 5:
+                settings.ResourceRegen.Level5IntervalSeconds = updatedValue;
+                break;
+            case 6:
+                settings.ResourceRegen.Level6IntervalSeconds = updatedValue;
+                break;
+            case 7:
+                settings.ResourceRegen.Level7IntervalSeconds = updatedValue;
+                break;
+            case 8:
+                settings.ResourceRegen.Level8IntervalSeconds = updatedValue;
+                break;
+            case 9:
+                settings.ResourceRegen.Level9IntervalSeconds = updatedValue;
+                break;
+        }
+    }
+
     private static void Section(string title)
     {
         GUILayout.Label(title);
@@ -239,6 +386,8 @@ internal static class SettingsRenderer
                 return "Diagnostics settings control whether the party probe runs and how often it samples game state.";
             case SettingsTab.HealthRegen:
                 return "Health Regen contains the current gameplay prototype. This is the tab that controls party, pet, summon, and undead handling.";
+            case SettingsTab.ResourceRegen:
+                return "Resource Regen contains the first spell-slot prototype. The current implementation targets spontaneous spellbooks and restores one slot when a configured per-level timer completes.";
             default:
                 return string.Empty;
         }
@@ -249,5 +398,15 @@ internal static class SettingsRenderer
         diagnosticsTickIntervalText ??= settings.Diagnostics.TickIntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         healthTickIntervalText ??= settings.HealthRegen.TickIntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         healthPerTickText ??= settings.HealthRegen.HealthPerTick.ToString(CultureInfo.InvariantCulture);
+        resourceTickIntervalText ??= settings.ResourceRegen.TickIntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel1IntervalText ??= settings.ResourceRegen.Level1IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel2IntervalText ??= settings.ResourceRegen.Level2IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel3IntervalText ??= settings.ResourceRegen.Level3IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel4IntervalText ??= settings.ResourceRegen.Level4IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel5IntervalText ??= settings.ResourceRegen.Level5IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel6IntervalText ??= settings.ResourceRegen.Level6IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel7IntervalText ??= settings.ResourceRegen.Level7IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel8IntervalText ??= settings.ResourceRegen.Level8IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel9IntervalText ??= settings.ResourceRegen.Level9IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
     }
 }

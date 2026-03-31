@@ -16,6 +16,19 @@ internal sealed class SettingsSnapshot
     public bool HealthRegenShowInGameLog;
     public float HealthRegenTickIntervalSeconds;
     public int HealthRegenHealthPerTick;
+    public bool ResourceRegenEnabled;
+    public bool ResourceRegenOutOfCombatOnly;
+    public float ResourceRegenTickIntervalSeconds;
+    public bool ResourceRegenEnableSpontaneousSpellbookRegen;
+    public float ResourceRegenLevel1IntervalSeconds;
+    public float ResourceRegenLevel2IntervalSeconds;
+    public float ResourceRegenLevel3IntervalSeconds;
+    public float ResourceRegenLevel4IntervalSeconds;
+    public float ResourceRegenLevel5IntervalSeconds;
+    public float ResourceRegenLevel6IntervalSeconds;
+    public float ResourceRegenLevel7IntervalSeconds;
+    public float ResourceRegenLevel8IntervalSeconds;
+    public float ResourceRegenLevel9IntervalSeconds;
 
     public static SettingsSnapshot Capture(ModSettings settings)
     {
@@ -32,7 +45,20 @@ internal sealed class SettingsSnapshot
             HealthRegenIncludeSummons = settings.HealthRegen.IncludeSummons,
             HealthRegenShowInGameLog = settings.HealthRegen.ShowHealingInGameLog,
             HealthRegenTickIntervalSeconds = settings.HealthRegen.TickIntervalSeconds,
-            HealthRegenHealthPerTick = settings.HealthRegen.HealthPerTick
+            HealthRegenHealthPerTick = settings.HealthRegen.HealthPerTick,
+            ResourceRegenEnabled = settings.ResourceRegen.Enabled,
+            ResourceRegenOutOfCombatOnly = settings.ResourceRegen.OnlyRegenOutOfCombat,
+            ResourceRegenTickIntervalSeconds = settings.ResourceRegen.TickIntervalSeconds,
+            ResourceRegenEnableSpontaneousSpellbookRegen = settings.ResourceRegen.EnableSpontaneousSpellbookRegen,
+            ResourceRegenLevel1IntervalSeconds = settings.ResourceRegen.Level1IntervalSeconds,
+            ResourceRegenLevel2IntervalSeconds = settings.ResourceRegen.Level2IntervalSeconds,
+            ResourceRegenLevel3IntervalSeconds = settings.ResourceRegen.Level3IntervalSeconds,
+            ResourceRegenLevel4IntervalSeconds = settings.ResourceRegen.Level4IntervalSeconds,
+            ResourceRegenLevel5IntervalSeconds = settings.ResourceRegen.Level5IntervalSeconds,
+            ResourceRegenLevel6IntervalSeconds = settings.ResourceRegen.Level6IntervalSeconds,
+            ResourceRegenLevel7IntervalSeconds = settings.ResourceRegen.Level7IntervalSeconds,
+            ResourceRegenLevel8IntervalSeconds = settings.ResourceRegen.Level8IntervalSeconds,
+            ResourceRegenLevel9IntervalSeconds = settings.ResourceRegen.Level9IntervalSeconds
         };
     }
 
@@ -101,6 +127,71 @@ internal sealed class SettingsSnapshot
         if (HealthRegenHealthPerTick != previous.HealthRegenHealthPerTick)
         {
             yield return $"HealthRegen.HealthPerTick: {previous.HealthRegenHealthPerTick} -> {HealthRegenHealthPerTick}";
+        }
+
+        if (ResourceRegenEnabled != previous.ResourceRegenEnabled)
+        {
+            yield return $"ResourceRegen.Enabled: {previous.ResourceRegenEnabled} -> {ResourceRegenEnabled}";
+        }
+
+        if (ResourceRegenOutOfCombatOnly != previous.ResourceRegenOutOfCombatOnly)
+        {
+            yield return $"ResourceRegen.OnlyRegenOutOfCombat: {previous.ResourceRegenOutOfCombatOnly} -> {ResourceRegenOutOfCombatOnly}";
+        }
+
+        if (ResourceRegenTickIntervalSeconds != previous.ResourceRegenTickIntervalSeconds)
+        {
+            yield return $"ResourceRegen.TickIntervalSeconds: {previous.ResourceRegenTickIntervalSeconds:0.###} -> {ResourceRegenTickIntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenEnableSpontaneousSpellbookRegen != previous.ResourceRegenEnableSpontaneousSpellbookRegen)
+        {
+            yield return $"ResourceRegen.EnableSpontaneousSpellbookRegen: {previous.ResourceRegenEnableSpontaneousSpellbookRegen} -> {ResourceRegenEnableSpontaneousSpellbookRegen}";
+        }
+
+        if (ResourceRegenLevel1IntervalSeconds != previous.ResourceRegenLevel1IntervalSeconds)
+        {
+            yield return $"ResourceRegen.Level1IntervalSeconds: {previous.ResourceRegenLevel1IntervalSeconds:0.###} -> {ResourceRegenLevel1IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenLevel2IntervalSeconds != previous.ResourceRegenLevel2IntervalSeconds)
+        {
+            yield return $"ResourceRegen.Level2IntervalSeconds: {previous.ResourceRegenLevel2IntervalSeconds:0.###} -> {ResourceRegenLevel2IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenLevel3IntervalSeconds != previous.ResourceRegenLevel3IntervalSeconds)
+        {
+            yield return $"ResourceRegen.Level3IntervalSeconds: {previous.ResourceRegenLevel3IntervalSeconds:0.###} -> {ResourceRegenLevel3IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenLevel4IntervalSeconds != previous.ResourceRegenLevel4IntervalSeconds)
+        {
+            yield return $"ResourceRegen.Level4IntervalSeconds: {previous.ResourceRegenLevel4IntervalSeconds:0.###} -> {ResourceRegenLevel4IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenLevel5IntervalSeconds != previous.ResourceRegenLevel5IntervalSeconds)
+        {
+            yield return $"ResourceRegen.Level5IntervalSeconds: {previous.ResourceRegenLevel5IntervalSeconds:0.###} -> {ResourceRegenLevel5IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenLevel6IntervalSeconds != previous.ResourceRegenLevel6IntervalSeconds)
+        {
+            yield return $"ResourceRegen.Level6IntervalSeconds: {previous.ResourceRegenLevel6IntervalSeconds:0.###} -> {ResourceRegenLevel6IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenLevel7IntervalSeconds != previous.ResourceRegenLevel7IntervalSeconds)
+        {
+            yield return $"ResourceRegen.Level7IntervalSeconds: {previous.ResourceRegenLevel7IntervalSeconds:0.###} -> {ResourceRegenLevel7IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenLevel8IntervalSeconds != previous.ResourceRegenLevel8IntervalSeconds)
+        {
+            yield return $"ResourceRegen.Level8IntervalSeconds: {previous.ResourceRegenLevel8IntervalSeconds:0.###} -> {ResourceRegenLevel8IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenLevel9IntervalSeconds != previous.ResourceRegenLevel9IntervalSeconds)
+        {
+            yield return $"ResourceRegen.Level9IntervalSeconds: {previous.ResourceRegenLevel9IntervalSeconds:0.###} -> {ResourceRegenLevel9IntervalSeconds:0.###}";
         }
     }
 }

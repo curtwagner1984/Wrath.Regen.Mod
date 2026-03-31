@@ -73,6 +73,7 @@ public static class Main
         {
             PartyProbeController.Tick(logger, settings, deltaTime);
             HealthRegenController.Tick(logger, settings, deltaTime);
+            ResourceRegenController.Tick(logger, settings, deltaTime);
         }
         catch (System.Exception ex)
         {
