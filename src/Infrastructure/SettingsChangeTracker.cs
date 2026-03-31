@@ -21,6 +21,7 @@ internal sealed class SettingsSnapshot
     public float ResourceRegenTickIntervalSeconds;
     public bool ResourceRegenEnableSpontaneousSpellbookRegen;
     public bool ResourceRegenEnablePreparedSpellbookRegen;
+    public bool ResourceRegenEnableGenericAbilityResourceRegen;
     public bool ResourceRegenShowVisualEffects;
     public ResourceRegenVisualEffectStyle ResourceRegenVisualEffectStyle;
     public float ResourceRegenLevel1IntervalSeconds;
@@ -32,6 +33,13 @@ internal sealed class SettingsSnapshot
     public float ResourceRegenLevel7IntervalSeconds;
     public float ResourceRegenLevel8IntervalSeconds;
     public float ResourceRegenLevel9IntervalSeconds;
+    public int ResourceRegenGenericResourceRestoreAmount;
+    public float ResourceRegenGenericTier1IntervalSeconds;
+    public float ResourceRegenGenericTier2IntervalSeconds;
+    public float ResourceRegenGenericTier3IntervalSeconds;
+    public float ResourceRegenGenericTier4IntervalSeconds;
+    public float ResourceRegenGenericTier5IntervalSeconds;
+    public float ResourceRegenGenericTier6IntervalSeconds;
 
     public static SettingsSnapshot Capture(ModSettings settings)
     {
@@ -54,6 +62,7 @@ internal sealed class SettingsSnapshot
             ResourceRegenTickIntervalSeconds = settings.ResourceRegen.TickIntervalSeconds,
             ResourceRegenEnableSpontaneousSpellbookRegen = settings.ResourceRegen.EnableSpontaneousSpellbookRegen,
             ResourceRegenEnablePreparedSpellbookRegen = settings.ResourceRegen.EnablePreparedSpellbookRegen,
+            ResourceRegenEnableGenericAbilityResourceRegen = settings.ResourceRegen.EnableGenericAbilityResourceRegen,
             ResourceRegenShowVisualEffects = settings.ResourceRegen.ShowVisualEffects,
             ResourceRegenVisualEffectStyle = settings.ResourceRegen.VisualEffectStyle,
             ResourceRegenLevel1IntervalSeconds = settings.ResourceRegen.Level1IntervalSeconds,
@@ -64,7 +73,14 @@ internal sealed class SettingsSnapshot
             ResourceRegenLevel6IntervalSeconds = settings.ResourceRegen.Level6IntervalSeconds,
             ResourceRegenLevel7IntervalSeconds = settings.ResourceRegen.Level7IntervalSeconds,
             ResourceRegenLevel8IntervalSeconds = settings.ResourceRegen.Level8IntervalSeconds,
-            ResourceRegenLevel9IntervalSeconds = settings.ResourceRegen.Level9IntervalSeconds
+            ResourceRegenLevel9IntervalSeconds = settings.ResourceRegen.Level9IntervalSeconds,
+            ResourceRegenGenericResourceRestoreAmount = settings.ResourceRegen.GenericResourceRestoreAmount,
+            ResourceRegenGenericTier1IntervalSeconds = settings.ResourceRegen.GenericTier1IntervalSeconds,
+            ResourceRegenGenericTier2IntervalSeconds = settings.ResourceRegen.GenericTier2IntervalSeconds,
+            ResourceRegenGenericTier3IntervalSeconds = settings.ResourceRegen.GenericTier3IntervalSeconds,
+            ResourceRegenGenericTier4IntervalSeconds = settings.ResourceRegen.GenericTier4IntervalSeconds,
+            ResourceRegenGenericTier5IntervalSeconds = settings.ResourceRegen.GenericTier5IntervalSeconds,
+            ResourceRegenGenericTier6IntervalSeconds = settings.ResourceRegen.GenericTier6IntervalSeconds
         };
     }
 
@@ -160,6 +176,11 @@ internal sealed class SettingsSnapshot
             yield return $"ResourceRegen.EnablePreparedSpellbookRegen: {previous.ResourceRegenEnablePreparedSpellbookRegen} -> {ResourceRegenEnablePreparedSpellbookRegen}";
         }
 
+        if (ResourceRegenEnableGenericAbilityResourceRegen != previous.ResourceRegenEnableGenericAbilityResourceRegen)
+        {
+            yield return $"ResourceRegen.EnableGenericAbilityResourceRegen: {previous.ResourceRegenEnableGenericAbilityResourceRegen} -> {ResourceRegenEnableGenericAbilityResourceRegen}";
+        }
+
         if (ResourceRegenShowVisualEffects != previous.ResourceRegenShowVisualEffects)
         {
             yield return $"ResourceRegen.ShowVisualEffects: {previous.ResourceRegenShowVisualEffects} -> {ResourceRegenShowVisualEffects}";
@@ -213,6 +234,41 @@ internal sealed class SettingsSnapshot
         if (ResourceRegenLevel9IntervalSeconds != previous.ResourceRegenLevel9IntervalSeconds)
         {
             yield return $"ResourceRegen.Level9IntervalSeconds: {previous.ResourceRegenLevel9IntervalSeconds:0.###} -> {ResourceRegenLevel9IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenGenericResourceRestoreAmount != previous.ResourceRegenGenericResourceRestoreAmount)
+        {
+            yield return $"ResourceRegen.GenericResourceRestoreAmount: {previous.ResourceRegenGenericResourceRestoreAmount} -> {ResourceRegenGenericResourceRestoreAmount}";
+        }
+
+        if (ResourceRegenGenericTier1IntervalSeconds != previous.ResourceRegenGenericTier1IntervalSeconds)
+        {
+            yield return $"ResourceRegen.GenericTier1IntervalSeconds: {previous.ResourceRegenGenericTier1IntervalSeconds:0.###} -> {ResourceRegenGenericTier1IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenGenericTier2IntervalSeconds != previous.ResourceRegenGenericTier2IntervalSeconds)
+        {
+            yield return $"ResourceRegen.GenericTier2IntervalSeconds: {previous.ResourceRegenGenericTier2IntervalSeconds:0.###} -> {ResourceRegenGenericTier2IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenGenericTier3IntervalSeconds != previous.ResourceRegenGenericTier3IntervalSeconds)
+        {
+            yield return $"ResourceRegen.GenericTier3IntervalSeconds: {previous.ResourceRegenGenericTier3IntervalSeconds:0.###} -> {ResourceRegenGenericTier3IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenGenericTier4IntervalSeconds != previous.ResourceRegenGenericTier4IntervalSeconds)
+        {
+            yield return $"ResourceRegen.GenericTier4IntervalSeconds: {previous.ResourceRegenGenericTier4IntervalSeconds:0.###} -> {ResourceRegenGenericTier4IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenGenericTier5IntervalSeconds != previous.ResourceRegenGenericTier5IntervalSeconds)
+        {
+            yield return $"ResourceRegen.GenericTier5IntervalSeconds: {previous.ResourceRegenGenericTier5IntervalSeconds:0.###} -> {ResourceRegenGenericTier5IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenGenericTier6IntervalSeconds != previous.ResourceRegenGenericTier6IntervalSeconds)
+        {
+            yield return $"ResourceRegen.GenericTier6IntervalSeconds: {previous.ResourceRegenGenericTier6IntervalSeconds:0.###} -> {ResourceRegenGenericTier6IntervalSeconds:0.###}";
         }
     }
 }

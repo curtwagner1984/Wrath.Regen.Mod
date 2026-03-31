@@ -50,6 +50,7 @@ public sealed class ResourceRegenSettings
     public float TickIntervalSeconds = 1.0f;
     public bool EnableSpontaneousSpellbookRegen = true;
     public bool EnablePreparedSpellbookRegen = true;
+    public bool EnableGenericAbilityResourceRegen = true;
     public bool ShowVisualEffects = true;
     public ResourceRegenVisualEffectStyle VisualEffectStyle = ResourceRegenVisualEffectStyle.DivineRefresh;
     public float Level1IntervalSeconds = 30.0f;
@@ -61,6 +62,13 @@ public sealed class ResourceRegenSettings
     public float Level7IntervalSeconds = 120.0f;
     public float Level8IntervalSeconds = 150.0f;
     public float Level9IntervalSeconds = 180.0f;
+    public int GenericResourceRestoreAmount = 1;
+    public float GenericTier1IntervalSeconds = 30.0f;
+    public float GenericTier2IntervalSeconds = 40.0f;
+    public float GenericTier3IntervalSeconds = 50.0f;
+    public float GenericTier4IntervalSeconds = 60.0f;
+    public float GenericTier5IntervalSeconds = 75.0f;
+    public float GenericTier6IntervalSeconds = 90.0f;
 
     public float GetIntervalSecondsForSpellLevel(int spellLevel)
     {
@@ -87,6 +95,62 @@ public sealed class ResourceRegenSettings
             default:
                 return 0f;
         }
+    }
+
+    public float GetIntervalSecondsForGenericResourceMax(int maxAmount)
+    {
+        switch (GetGenericResourceTier(maxAmount))
+        {
+            case 1:
+                return GenericTier1IntervalSeconds;
+            case 2:
+                return GenericTier2IntervalSeconds;
+            case 3:
+                return GenericTier3IntervalSeconds;
+            case 4:
+                return GenericTier4IntervalSeconds;
+            case 5:
+                return GenericTier5IntervalSeconds;
+            case 6:
+                return GenericTier6IntervalSeconds;
+            default:
+                return 0f;
+        }
+    }
+
+    public int GetGenericResourceTier(int maxAmount)
+    {
+        if (maxAmount >= 10)
+        {
+            return 1;
+        }
+
+        if (maxAmount >= 8)
+        {
+            return 2;
+        }
+
+        if (maxAmount >= 6)
+        {
+            return 3;
+        }
+
+        if (maxAmount >= 4)
+        {
+            return 4;
+        }
+
+        if (maxAmount >= 2)
+        {
+            return 5;
+        }
+
+        if (maxAmount >= 1)
+        {
+            return 6;
+        }
+
+        return 0;
     }
 }
 

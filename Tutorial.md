@@ -1232,6 +1232,7 @@ Current behavior:
 - acts on:
   - spontaneous spellbooks by restoring one slot at a spell level
   - prepared spellbooks by restoring one spent prepared slot in slot order at a spell level
+  - generic `BlueprintAbilityResource` pools by restoring one charge at a tiered interval based on the resource's runtime max amount
 - tracks separate timers per:
   - strategy
   - unit
@@ -1241,15 +1242,28 @@ Current behavior:
   - choose the first spent prepared slot by slot index
   - set `Available = true`
   - remove that spell from `RemoveMemorizedSpells` if needed
+- for generic ability resources, the current policy is:
+  - map the resource's runtime max amount to a regeneration tier
+  - tier 1: max uses `10+`
+  - tier 2: max uses `8-9`
+  - tier 3: max uses `6-7`
+  - tier 4: max uses `4-5`
+  - tier 5: max uses `2-3`
+  - tier 6: max uses `1`
+  - restore `1` charge when that tier's timer completes
 
 Settings model:
 
 - controller on/off
 - out-of-combat only toggle
 - spontaneous spellbook strategy on/off
+- prepared spellbook strategy on/off
+- generic ability-resource strategy on/off
 - controller scan interval
 - per-spell-level restore interval for levels 1 through 9
 - setting a level interval to `0` disables regeneration for that spell level
+- generic resource restore amount
+- generic resource tier intervals stored separately from spell intervals, with defaults seeded to the same timing curve
 
 Logging model:
 

@@ -49,6 +49,13 @@ internal static class SettingsRenderer
     private static string resourceLevel7IntervalText;
     private static string resourceLevel8IntervalText;
     private static string resourceLevel9IntervalText;
+    private static string resourceGenericRestoreAmountText;
+    private static string resourceGenericTier1IntervalText;
+    private static string resourceGenericTier2IntervalText;
+    private static string resourceGenericTier3IntervalText;
+    private static string resourceGenericTier4IntervalText;
+    private static string resourceGenericTier5IntervalText;
+    private static string resourceGenericTier6IntervalText;
 
     public static void Draw(ModSettings settings)
     {
@@ -189,6 +196,11 @@ internal static class SettingsRenderer
             "Enable prepared spellbook regeneration",
             "Restores one spent prepared slot at configured levels when the timer for that level completes. The current policy restores slots in order.");
 
+        settings.ResourceRegen.EnableGenericAbilityResourceRegen = Toggle(
+            settings.ResourceRegen.EnableGenericAbilityResourceRegen,
+            "Enable generic ability resource regeneration",
+            "Restores one generic resource charge when the timer for that resource tier completes. Tiers are assigned from the resource's runtime max amount.");
+
         settings.ResourceRegen.ShowVisualEffects = Toggle(
             settings.ResourceRegen.ShowVisualEffects,
             "Show visual effects when resources regenerate",
@@ -263,6 +275,55 @@ internal static class SettingsRenderer
             resourceLevel9IntervalText,
             value => resourceLevel9IntervalText = value,
             settings.ResourceRegen.Level9IntervalSeconds);
+
+        GUILayout.Space(8f);
+        Section("Generic Ability Resources");
+
+        settings.ResourceRegen.GenericResourceRestoreAmount = IntField(
+            "Generic resource restored per tick",
+            resourceGenericRestoreAmountText,
+            value => resourceGenericRestoreAmountText = value,
+            settings.ResourceRegen.GenericResourceRestoreAmount,
+            1,
+            100,
+            "How many generic resource charges to restore whenever a resource tier timer completes.");
+
+        DrawGenericResourceTierField(
+            "Tier 1 interval (max uses 10+)",
+            resourceGenericTier1IntervalText,
+            value => resourceGenericTier1IntervalText = value,
+            settings.ResourceRegen.GenericTier1IntervalSeconds,
+            updatedValue => settings.ResourceRegen.GenericTier1IntervalSeconds = updatedValue);
+        DrawGenericResourceTierField(
+            "Tier 2 interval (max uses 8-9)",
+            resourceGenericTier2IntervalText,
+            value => resourceGenericTier2IntervalText = value,
+            settings.ResourceRegen.GenericTier2IntervalSeconds,
+            updatedValue => settings.ResourceRegen.GenericTier2IntervalSeconds = updatedValue);
+        DrawGenericResourceTierField(
+            "Tier 3 interval (max uses 6-7)",
+            resourceGenericTier3IntervalText,
+            value => resourceGenericTier3IntervalText = value,
+            settings.ResourceRegen.GenericTier3IntervalSeconds,
+            updatedValue => settings.ResourceRegen.GenericTier3IntervalSeconds = updatedValue);
+        DrawGenericResourceTierField(
+            "Tier 4 interval (max uses 4-5)",
+            resourceGenericTier4IntervalText,
+            value => resourceGenericTier4IntervalText = value,
+            settings.ResourceRegen.GenericTier4IntervalSeconds,
+            updatedValue => settings.ResourceRegen.GenericTier4IntervalSeconds = updatedValue);
+        DrawGenericResourceTierField(
+            "Tier 5 interval (max uses 2-3)",
+            resourceGenericTier5IntervalText,
+            value => resourceGenericTier5IntervalText = value,
+            settings.ResourceRegen.GenericTier5IntervalSeconds,
+            updatedValue => settings.ResourceRegen.GenericTier5IntervalSeconds = updatedValue);
+        DrawGenericResourceTierField(
+            "Tier 6 interval (max uses 1)",
+            resourceGenericTier6IntervalText,
+            value => resourceGenericTier6IntervalText = value,
+            settings.ResourceRegen.GenericTier6IntervalSeconds,
+            updatedValue => settings.ResourceRegen.GenericTier6IntervalSeconds = updatedValue);
     }
 
     private static bool Toggle(bool value, string label, string tooltip)
@@ -398,6 +459,25 @@ internal static class SettingsRenderer
         }
     }
 
+    private static void DrawGenericResourceTierField(
+        string label,
+        string textValue,
+        Action<string> setTextValue,
+        float currentValue,
+        Action<float> applyValue)
+    {
+        var updatedValue = FloatField(
+            label,
+            textValue,
+            setTextValue,
+            currentValue,
+            0f,
+            3600f,
+            "How long it takes to restore one generic resource charge for pools that fall into this max-usage tier. Set to 0 to disable this tier.");
+
+        applyValue(updatedValue);
+    }
+
     private static void Section(string title)
     {
         GUILayout.Label(title);
@@ -422,7 +502,7 @@ internal static class SettingsRenderer
             case SettingsTab.HealthRegen:
                 return "Health Regen contains the current gameplay prototype. This is the tab that controls party, pet, summon, and undead handling.";
             case SettingsTab.ResourceRegen:
-                return "Resource Regen contains the spell-slot prototype. It currently supports spontaneous spellbooks and ordered prepared-slot restoration, both driven by the same per-level timers.";
+                return "Resource Regen contains the spell and ability prototype. It currently supports spontaneous spellbooks, ordered prepared-slot restoration, and generic ability-resource regeneration driven by max-usage tiers.";
             default:
                 return string.Empty;
         }
@@ -443,5 +523,12 @@ internal static class SettingsRenderer
         resourceLevel7IntervalText ??= settings.ResourceRegen.Level7IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         resourceLevel8IntervalText ??= settings.ResourceRegen.Level8IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         resourceLevel9IntervalText ??= settings.ResourceRegen.Level9IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceGenericRestoreAmountText ??= settings.ResourceRegen.GenericResourceRestoreAmount.ToString(CultureInfo.InvariantCulture);
+        resourceGenericTier1IntervalText ??= settings.ResourceRegen.GenericTier1IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceGenericTier2IntervalText ??= settings.ResourceRegen.GenericTier2IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceGenericTier3IntervalText ??= settings.ResourceRegen.GenericTier3IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceGenericTier4IntervalText ??= settings.ResourceRegen.GenericTier4IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceGenericTier5IntervalText ??= settings.ResourceRegen.GenericTier5IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceGenericTier6IntervalText ??= settings.ResourceRegen.GenericTier6IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
     }
 }
