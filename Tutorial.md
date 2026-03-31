@@ -22,7 +22,9 @@ Build a small Unity Mod Manager mod for Pathfinder: Wrath of the Righteous that 
 - [Info.json](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/Info.json)
 - [src/Main.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/Main.cs)
 - [src/ModSettings.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/ModSettings.cs)
-- [src/RegenController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/RegenController.cs)
+- [src/Features/Diagnostics/PartyProbeController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/Features/Diagnostics/PartyProbeController.cs)
+- [src/Features/HealthRegen/HealthRegenController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/Features/HealthRegen/HealthRegenController.cs)
+- [src/UI/SettingsRenderer.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/UI/SettingsRenderer.cs)
 - [README.md](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/README.md)
 
 ## Build Setup
@@ -71,8 +73,8 @@ Unity Mod Manager writes logs to:
 
 Our current test messages include:
 
-- `RegenController is running. Next step: replace this stub with real party/resource logic.`
-- `Tick fired. Hook game state inspection here.`
+- `PartyProbeController is running.`
+- `HealthRegenController is running. Prototype healing uses Wrath's built-in rule system.`
 
 This confirms:
 
@@ -306,12 +308,39 @@ Current structure:
 - `src/Infrastructure/ModLogger.cs`
 - `src/Features/Diagnostics/PartyProbeController.cs`
 - `src/Features/HealthRegen/HealthRegenController.cs`
+- `src/UI/SettingsRenderer.cs`
 
 This lets us keep:
 
 - diagnostics separate from gameplay logic
 - feature code separate from infrastructure
+- UI rendering separate from mod entrypoint wiring
 - future spell/resource regeneration work in its own files/folder
+
+## Settings Architecture
+
+The settings model is now split by responsibility instead of keeping all fields at the top level.
+
+Current sections:
+
+- `GeneralSettings`
+- `DiagnosticsSettings`
+- `HealthRegenSettings`
+
+These are stored inside:
+
+- [src/ModSettings.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/ModSettings.cs)
+
+The UI is now rendered through:
+
+- [src/UI/SettingsRenderer.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/UI/SettingsRenderer.cs)
+
+### UI goals
+
+- tabs per feature area
+- explicit numeric entry fields instead of only sliders
+- clear min/max ranges shown next to values
+- short help text through tooltips and a contextual help panel
 
 ## Current Development Strategy
 
@@ -327,23 +356,11 @@ Instead, we will use these steps:
 6. Add safety checks and settings.
 7. Expand carefully from there.
 
-## Next Task
-
-Update [src/RegenController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/RegenController.cs) so it logs:
-
-- whether `Game.Instance` is available
-- party count
-- each party member’s display name
-- current HP
-- max HP
-- whether the unit is in combat
-- whether the unit is dead or unconscious
-
 ## Progress Update
 
 We have now moved from a dummy tick logger to a real party snapshot logger.
 
-The current probe in [src/RegenController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/RegenController.cs) is designed to:
+The current probe in [src/Features/Diagnostics/PartyProbeController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/Features/Diagnostics/PartyProbeController.cs) is designed to:
 
 - wait until `Game.Instance` and `Game.Instance.Player` are available
 - read `Game.Instance.Player.Party`
