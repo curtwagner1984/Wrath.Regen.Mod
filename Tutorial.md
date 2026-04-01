@@ -585,6 +585,43 @@ What this means:
 - burn has a dedicated runtime state holder
 - the game already provides a built-in decrement path through `HealBurn(...)`
 - kineticist regeneration should probably use that dedicated API instead of trying to treat burn like an ordinary `BlueprintAbilityResource`
+- `MaxBurn` itself is backed by resources, but accepted burn state is still managed by `UnitPartKineticist`
+
+### Overflow bonus inference
+
+The clearest burn-bonus component found so far is:
+
+- `Kingmaker.UnitLogic.Class.Kineticist.AddKineticistElementalOverflow`
+
+Important behavior:
+
+- it computes an intermediate cap with:
+  - `Math.Min(Bonus.Calculate(context), unitPartKineticist.ClassLevel / 3)`
+- unless `IgnoreBurn` is set, it then caps the effective bonus again by:
+  - `unitPartKineticist.AcceptedBurn`
+
+Practical conclusion:
+
+- a possible "max useful burn" threshold exists
+- but it is not exposed as a simple property on `UnitPartKineticist`
+- it appears to depend on:
+  - class level
+  - the current overflow fact's configured bonus
+  - accepted burn
+
+This means a smart `keep burn for max bonuses` mode is plausible, but it is inference-driven rather than a simple direct read from the core burn unit part.
+
+### Elemental Engine caveat
+
+`AddKineticistElementalOverflow` also has an `ElementalEngine` path:
+
+- when `unitPartKineticist.MaxBurn == unitPartKineticist.AcceptedBurn`
+- the overflow bonuses are increased further
+
+That means Elemental Engine is an important exception:
+
+- a generic smart-floor mode may be wrong for it
+- it may want to preserve full burn rather than just base overflow thresholds
 
 This matches the gameplay concern we already discussed:
 
