@@ -1,4 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="Wrath.Regen.Mod.local.props" Condition="Exists('Wrath.Regen.Mod.local.props')" />
+
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -9,10 +11,12 @@
     <AssemblyName>Wrath.Regen.Mod</AssemblyName>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin\</OutputPath>
-    <WrathGameDir Condition="'$(WrathGameDir)' == ''">D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure</WrathGameDir>
+    <WrathGameDirPlaceholder>C:\Path\To\Pathfinder Second Adventure</WrathGameDirPlaceholder>
+    <WrathGameDirEnvVarName>WRATH_GAME_DIR</WrathGameDirEnvVarName>
+    <WrathGameDir Condition="'$(WrathGameDir)' == '' and '$(WRATH_GAME_DIR)' != ''">$(WRATH_GAME_DIR)</WrathGameDir>
+    <WrathGameDir Condition="'$(WrathGameDir)' == ''">$(WrathGameDirPlaceholder)</WrathGameDir>
     <WrathManagedDir Condition="'$(WrathManagedDir)' == ''">$(WrathGameDir)\Wrath_Data\Managed</WrathManagedDir>
     <WrathModsDir Condition="'$(WrathModsDir)' == ''">$(WrathGameDir)\Mods\Wrath.Regen.Mod</WrathModsDir>
-    <WrathGameDirPlaceholder>C:\Path\To\Pathfinder Second Adventure</WrathGameDirPlaceholder>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,7 +51,7 @@
   <Target Name="ValidateWrathPaths" BeforeTargets="ResolveReferences">
     <Error
       Condition="'$(WrathGameDir)' == '$(WrathGameDirPlaceholder)'"
-      Text="Set WrathGameDir in Wrath.Regen.Mod.csproj to your real Pathfinder: Wrath of the Righteous install folder before building." />
+      Text="Set WrathGameDir via the WRATH_GAME_DIR environment variable or a local Wrath.Regen.Mod.local.props file before building." />
     <Error
       Condition="!Exists('$(WrathManagedDir)\Assembly-CSharp.dll')"
       Text="Could not find $(WrathManagedDir)\Assembly-CSharp.dll. Check WrathGameDir/WrathManagedDir." />

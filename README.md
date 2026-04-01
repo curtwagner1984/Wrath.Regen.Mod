@@ -21,7 +21,9 @@ Minimal Unity Mod Manager scaffold for Pathfinder: Wrath of the Righteous.
 ## First-Time Setup
 
 1. Open [Wrath.Regen.Mod.csproj](./Wrath.Regen.Mod.csproj).
-2. Replace the placeholder `WrathGameDir` path with your actual game folder.
+2. Set your game folder locally by either:
+   - defining the `WRATH_GAME_DIR` environment variable, or
+   - copying `Wrath.Regen.Mod.local.props.example` to `Wrath.Regen.Mod.local.props` and editing `WrathGameDir`
 3. Confirm these files exist under your game install:
    - `Wrath_Data\Managed\Assembly-CSharp.dll`
    - `Wrath_Data\Managed\0Harmony.dll`
@@ -31,6 +33,16 @@ Minimal Unity Mod Manager scaffold for Pathfinder: Wrath of the Righteous.
    - `Wrath.Regen.Mod.dll`
    - `Info.json`
 6. Launch the game and verify the mod appears in UMM.
+
+Example local props file:
+
+```xml
+<Project>
+  <PropertyGroup>
+    <WrathGameDir>D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure</WrathGameDir>
+  </PropertyGroup>
+</Project>
+```
 
 ## What To Expect In Game
 
