@@ -50,7 +50,7 @@ Some classes and archetypes still have unique mechanics that may need deeper cla
 Extract the mod into your Wrath `Mods` folder so the final path looks like:
 
 ```text
-<Pathfinder Wrath install folder>\Mods\Wrath.Regen.Mod\Info.json
+<Pathfinder Wrath install folder>\Mods\Wrath.Regen.Mod
 ```
 
 If you are using a packaged release zip, it should already contain the correct `Wrath.Regen.Mod` folder layout.
