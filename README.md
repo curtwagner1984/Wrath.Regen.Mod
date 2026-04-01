@@ -20,7 +20,7 @@ Minimal Unity Mod Manager scaffold for Pathfinder: Wrath of the Righteous.
 
 ## First-Time Setup
 
-1. Open [Wrath.Regen.Mod.csproj](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/Wrath.Regen.Mod.csproj).
+1. Open [Wrath.Regen.Mod.csproj](./Wrath.Regen.Mod.csproj).
 2. Replace the placeholder `WrathGameDir` path with your actual game folder.
 3. Confirm these files exist under your game install:
    - `Wrath_Data\Managed\Assembly-CSharp.dll`
@@ -52,6 +52,6 @@ That is intentional. Once the scaffold is loading, you can safely move on to act
 
 ## Good Files To Edit Next
 
-- [src/Main.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/Main.cs)
-- [src/ModSettings.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/ModSettings.cs)
-- [src/RegenController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/RegenController.cs)
+- [src/Main.cs](./src/Main.cs)
+- [src/ModSettings.cs](./src/ModSettings.cs)
+- [src/RegenController.cs](./src/RegenController.cs)

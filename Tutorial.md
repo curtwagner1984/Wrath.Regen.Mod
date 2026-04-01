@@ -18,14 +18,14 @@ Build a small Unity Mod Manager mod for Pathfinder: Wrath of the Righteous that 
 
 ## Important Files
 
-- [Wrath.Regen.Mod.csproj](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/Wrath.Regen.Mod.csproj)
-- [Info.json](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/Info.json)
-- [src/Main.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/Main.cs)
-- [src/ModSettings.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/ModSettings.cs)
-- [src/Features/Diagnostics/PartyProbeController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/Features/Diagnostics/PartyProbeController.cs)
-- [src/Features/HealthRegen/HealthRegenController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/Features/HealthRegen/HealthRegenController.cs)
-- [src/UI/SettingsRenderer.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/UI/SettingsRenderer.cs)
-- [README.md](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/README.md)
+- [Wrath.Regen.Mod.csproj](./Wrath.Regen.Mod.csproj)
+- [Info.json](./Info.json)
+- [src/Main.cs](./src/Main.cs)
+- [src/ModSettings.cs](./src/ModSettings.cs)
+- [src/Features/Diagnostics/PartyProbeController.cs](./src/Features/Diagnostics/PartyProbeController.cs)
+- [src/Features/HealthRegen/HealthRegenController.cs](./src/Features/HealthRegen/HealthRegenController.cs)
+- [src/UI/SettingsRenderer.cs](./src/UI/SettingsRenderer.cs)
+- [README.md](./README.md)
 
 ## Build Setup
 
@@ -37,14 +37,14 @@ Build a small Unity Mod Manager mod for Pathfinder: Wrath of the Righteous that 
 ### Game path
 
 - Current game root:
-  `D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure`
+  `<WrathGameDir>`
 
 ### Key references
 
 The project references game and modding DLLs from:
 
-- `D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure\Wrath_Data\Managed`
-- `D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure\Wrath_Data\Managed\UnityModManager`
+- `<WrathGameDir>\Wrath_Data\Managed`
+- `<WrathGameDir>\Wrath_Data\Managed\UnityModManager`
 
 Important DLLs:
 
@@ -58,7 +58,7 @@ Important DLLs:
 
 The built mod is copied into:
 
-- `D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure\Mods\Wrath.Regen.Mod`
+- `<WrathGameDir>\Mods\Wrath.Regen.Mod`
 
 Expected files there:
 
@@ -69,7 +69,7 @@ Expected files there:
 
 Unity Mod Manager writes logs to:
 
-- [Log.txt](/D:/SteamLibrary/steamapps/common/Pathfinder%20Second%20Adventure/Wrath_Data/Managed/UnityModManager/Log.txt)
+- `<WrathGameDir>\Wrath_Data\Managed\UnityModManager\Log.txt`
 
 Our current test messages include:
 
@@ -152,13 +152,13 @@ At the time of setup, this returned:
 General pattern:
 
 ```powershell
-ilspycmd -t Full.Type.Name "D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure\Wrath_Data\Managed\Assembly-CSharp.dll"
+ilspycmd -t Full.Type.Name "<WrathGameDir>\Wrath_Data\Managed\Assembly-CSharp.dll"
 ```
 
 Example:
 
 ```powershell
-ilspycmd -t Kingmaker.Game "D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure\Wrath_Data\Managed\Assembly-CSharp.dll"
+ilspycmd -t Kingmaker.Game "<WrathGameDir>\Wrath_Data\Managed\Assembly-CSharp.dll"
 ```
 
 This lets us:
@@ -329,11 +329,11 @@ Current sections:
 
 These are stored inside:
 
-- [src/ModSettings.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/ModSettings.cs)
+- [src/ModSettings.cs](./src/ModSettings.cs)
 
 The UI is now rendered through:
 
-- [src/UI/SettingsRenderer.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/UI/SettingsRenderer.cs)
+- [src/UI/SettingsRenderer.cs](./src/UI/SettingsRenderer.cs)
 
 ### UI goals
 
@@ -360,7 +360,7 @@ Instead, we will use these steps:
 
 We have now moved from a dummy tick logger to a real party snapshot logger.
 
-The current probe in [src/Features/Diagnostics/PartyProbeController.cs](/c:/Users/mihae/antigravity/Wrath.Regen.Mod/src/Features/Diagnostics/PartyProbeController.cs) is designed to:
+The current probe in [src/Features/Diagnostics/PartyProbeController.cs](./src/Features/Diagnostics/PartyProbeController.cs) is designed to:
 
 - wait until `Game.Instance` and `Game.Instance.Player` are available
 - read `Game.Instance.Player.Party`
@@ -701,7 +701,7 @@ So our current research workflow is:
 
 We inspected concrete blueprint files from:
 
-- `D:\SteamLibrary\steamapps\common\Pathfinder Second Adventure\blueprints.zip`
+- `<WrathGameDir>\blueprints.zip`
 
 This let us move beyond generic code structure and confirm how real class mechanics are wired.
 
