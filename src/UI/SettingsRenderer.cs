@@ -56,6 +56,8 @@ internal static class SettingsRenderer
     private static string resourceGenericTier4IntervalText;
     private static string resourceGenericTier5IntervalText;
     private static string resourceGenericTier6IntervalText;
+    private static string kineticistBurnRestoreIntervalText;
+    private static string kineticistBurnFloorText;
 
     public static void Draw(ModSettings settings)
     {
@@ -324,6 +326,32 @@ internal static class SettingsRenderer
             value => resourceGenericTier6IntervalText = value,
             settings.ResourceRegen.GenericTier6IntervalSeconds,
             updatedValue => settings.ResourceRegen.GenericTier6IntervalSeconds = updatedValue);
+
+        GUILayout.Space(8f);
+        Section("Kineticist Burn");
+
+        settings.ResourceRegen.EnableKineticistBurnRegen = Toggle(
+            settings.ResourceRegen.EnableKineticistBurnRegen,
+            "Enable Kineticist burn regeneration",
+            "Restores Kineticist burn through the dedicated HealBurn path. This is separate from generic ability resources.");
+
+        settings.ResourceRegen.KineticistBurnRestoreIntervalSeconds = FloatField(
+            "Seconds per 1 burn restored",
+            kineticistBurnRestoreIntervalText,
+            value => kineticistBurnRestoreIntervalText = value,
+            settings.ResourceRegen.KineticistBurnRestoreIntervalSeconds,
+            0f,
+            3600f,
+            "How long it takes to heal 1 point of accepted Kineticist burn. Set to 0 to disable the Kineticist burn strategy.");
+
+        settings.ResourceRegen.KineticistBurnFloor = IntField(
+            "Restore burn until floor",
+            kineticistBurnFloorText,
+            value => kineticistBurnFloorText = value,
+            settings.ResourceRegen.KineticistBurnFloor,
+            0,
+            100,
+            "Kineticist burn regeneration stops once the unit reaches this accepted burn floor.");
     }
 
     private static bool Toggle(bool value, string label, string tooltip)
@@ -502,7 +530,7 @@ internal static class SettingsRenderer
             case SettingsTab.HealthRegen:
                 return "Health Regen contains the current gameplay prototype. This is the tab that controls party, pet, summon, and undead handling.";
             case SettingsTab.ResourceRegen:
-                return "Resource Regen contains the spell and ability prototype. It currently supports spontaneous spellbooks, ordered prepared-slot restoration, and generic ability-resource regeneration driven by max-usage tiers.";
+                return "Resource Regen contains the spell and ability prototype. It currently supports spontaneous spellbooks, ordered prepared-slot restoration, generic ability-resource regeneration, and fixed-floor Kineticist burn healing.";
             default:
                 return string.Empty;
         }
@@ -530,5 +558,7 @@ internal static class SettingsRenderer
         resourceGenericTier4IntervalText ??= settings.ResourceRegen.GenericTier4IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         resourceGenericTier5IntervalText ??= settings.ResourceRegen.GenericTier5IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         resourceGenericTier6IntervalText ??= settings.ResourceRegen.GenericTier6IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        kineticistBurnRestoreIntervalText ??= settings.ResourceRegen.KineticistBurnRestoreIntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        kineticistBurnFloorText ??= settings.ResourceRegen.KineticistBurnFloor.ToString(CultureInfo.InvariantCulture);
     }
 }

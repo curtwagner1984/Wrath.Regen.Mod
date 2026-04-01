@@ -69,6 +69,9 @@ public sealed class ResourceRegenSettings
     public float GenericTier4IntervalSeconds = 60.0f;
     public float GenericTier5IntervalSeconds = 75.0f;
     public float GenericTier6IntervalSeconds = 90.0f;
+    public bool EnableKineticistBurnRegen = false;
+    public float KineticistBurnRestoreIntervalSeconds = 60.0f;
+    public int KineticistBurnFloor = 0;
 
     public float GetIntervalSecondsForSpellLevel(int spellLevel)
     {

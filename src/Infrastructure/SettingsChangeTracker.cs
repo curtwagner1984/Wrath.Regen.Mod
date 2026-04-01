@@ -40,6 +40,9 @@ internal sealed class SettingsSnapshot
     public float ResourceRegenGenericTier4IntervalSeconds;
     public float ResourceRegenGenericTier5IntervalSeconds;
     public float ResourceRegenGenericTier6IntervalSeconds;
+    public bool ResourceRegenEnableKineticistBurnRegen;
+    public float ResourceRegenKineticistBurnRestoreIntervalSeconds;
+    public int ResourceRegenKineticistBurnFloor;
 
     public static SettingsSnapshot Capture(ModSettings settings)
     {
@@ -80,7 +83,10 @@ internal sealed class SettingsSnapshot
             ResourceRegenGenericTier3IntervalSeconds = settings.ResourceRegen.GenericTier3IntervalSeconds,
             ResourceRegenGenericTier4IntervalSeconds = settings.ResourceRegen.GenericTier4IntervalSeconds,
             ResourceRegenGenericTier5IntervalSeconds = settings.ResourceRegen.GenericTier5IntervalSeconds,
-            ResourceRegenGenericTier6IntervalSeconds = settings.ResourceRegen.GenericTier6IntervalSeconds
+            ResourceRegenGenericTier6IntervalSeconds = settings.ResourceRegen.GenericTier6IntervalSeconds,
+            ResourceRegenEnableKineticistBurnRegen = settings.ResourceRegen.EnableKineticistBurnRegen,
+            ResourceRegenKineticistBurnRestoreIntervalSeconds = settings.ResourceRegen.KineticistBurnRestoreIntervalSeconds,
+            ResourceRegenKineticistBurnFloor = settings.ResourceRegen.KineticistBurnFloor
         };
     }
 
@@ -269,6 +275,21 @@ internal sealed class SettingsSnapshot
         if (ResourceRegenGenericTier6IntervalSeconds != previous.ResourceRegenGenericTier6IntervalSeconds)
         {
             yield return $"ResourceRegen.GenericTier6IntervalSeconds: {previous.ResourceRegenGenericTier6IntervalSeconds:0.###} -> {ResourceRegenGenericTier6IntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenEnableKineticistBurnRegen != previous.ResourceRegenEnableKineticistBurnRegen)
+        {
+            yield return $"ResourceRegen.EnableKineticistBurnRegen: {previous.ResourceRegenEnableKineticistBurnRegen} -> {ResourceRegenEnableKineticistBurnRegen}";
+        }
+
+        if (ResourceRegenKineticistBurnRestoreIntervalSeconds != previous.ResourceRegenKineticistBurnRestoreIntervalSeconds)
+        {
+            yield return $"ResourceRegen.KineticistBurnRestoreIntervalSeconds: {previous.ResourceRegenKineticistBurnRestoreIntervalSeconds:0.###} -> {ResourceRegenKineticistBurnRestoreIntervalSeconds:0.###}";
+        }
+
+        if (ResourceRegenKineticistBurnFloor != previous.ResourceRegenKineticistBurnFloor)
+        {
+            yield return $"ResourceRegen.KineticistBurnFloor: {previous.ResourceRegenKineticistBurnFloor} -> {ResourceRegenKineticistBurnFloor}";
         }
     }
 }

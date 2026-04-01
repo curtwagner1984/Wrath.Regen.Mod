@@ -1270,6 +1270,7 @@ Current behavior:
   - spontaneous spellbooks by restoring one slot at a spell level
   - prepared spellbooks by restoring one spent prepared slot in slot order at a spell level
   - generic `BlueprintAbilityResource` pools by restoring one charge at a tiered interval based on the resource's runtime max amount
+  - Kineticist burn by calling `HealBurn(1)` until a configured floor is reached
 - tracks separate timers per:
   - strategy
   - unit
@@ -1288,6 +1289,11 @@ Current behavior:
   - tier 5: max uses `2-3`
   - tier 6: max uses `1`
   - restore `1` charge when that tier's timer completes
+- for Kineticist burn, the current low-risk policy is:
+  - enable or disable the Kineticist strategy independently
+  - wait for its own seconds-per-burn timer
+  - heal `1` accepted burn with `UnitPartKineticist.HealBurn(1)`
+  - stop once current burn is at or below the configured floor
 
 Settings model:
 
@@ -1301,6 +1307,9 @@ Settings model:
 - setting a level interval to `0` disables regeneration for that spell level
 - generic resource restore amount
 - generic resource tier intervals stored separately from spell intervals, with defaults seeded to the same timing curve
+- Kineticist burn strategy on/off
+- Kineticist seconds per `1` burn restored
+- Kineticist fixed burn floor
 
 Logging model:
 

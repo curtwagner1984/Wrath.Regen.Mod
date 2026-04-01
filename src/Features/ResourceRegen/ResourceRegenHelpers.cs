@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using Kingmaker.Blueprints;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Class.Kineticist;
 
 namespace WrathRegenMod;
 
@@ -33,5 +34,15 @@ internal static class ResourceRegenHelpers
     public static string GetResourceName(BlueprintScriptableObject blueprint)
     {
         return string.IsNullOrWhiteSpace(blueprint?.name) ? "<unnamed-resource>" : blueprint.name;
+    }
+
+    public static string GetKineticistDisplayName(UnitPartKineticist kineticistPart)
+    {
+        if (kineticistPart?.Owner?.Unit == null)
+        {
+            return "<unnamed>";
+        }
+
+        return GetUnitName(kineticistPart.Owner.Unit);
     }
 }

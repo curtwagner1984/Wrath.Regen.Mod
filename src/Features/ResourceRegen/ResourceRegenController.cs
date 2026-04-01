@@ -9,7 +9,8 @@ internal static class ResourceRegenController
     {
         new SpontaneousSpellbookRegenStrategy(),
         new PreparedSpellbookRegenStrategy(),
-        new GenericAbilityResourceRegenStrategy()
+        new GenericAbilityResourceRegenStrategy(),
+        new KineticistBurnRegenStrategy()
     };
 
     private static float elapsedSeconds;
@@ -24,7 +25,7 @@ internal static class ResourceRegenController
 
         if (!loggedReadyMessage)
         {
-            logger.Info("ResourceRegenController is running. Prototype resource regeneration currently targets spontaneous spellbooks, prepared spellbooks, and generic ability resources.");
+            logger.Info("ResourceRegenController is running. Prototype resource regeneration currently targets spellbooks, generic ability resources, and Kineticist burn.");
             loggedReadyMessage = true;
         }
 
