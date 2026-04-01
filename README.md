@@ -4,6 +4,24 @@
 
 The mod is designed around runtime capability detection rather than hardcoding a single class flow, so it can already handle several major resource systems used by Wrath classes.
 
+## Screenshots
+
+### General Settings
+
+![General settings](./screenshots/general_settings.png)
+
+### Health Regen Settings
+
+![Health regeneration settings](./screenshots/health_regen_settings.png)
+
+### Resource Regen Settings
+
+![Resource regeneration settings](./screenshots/resource_regen_settings.png)
+
+### In-Game Log Example
+
+![In-game event log example](./screenshots/example_of_in_game_log.png)
+
 ## Current Features
 
 - Out-of-combat health regeneration
