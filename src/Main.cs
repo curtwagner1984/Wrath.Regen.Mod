@@ -1,4 +1,6 @@
 using HarmonyLib;
+using Kingmaker;
+using Kingmaker.GameModes;
 using UnityModManagerNet;
 
 namespace WrathRegenMod;
@@ -66,6 +68,21 @@ public static class Main
     private static void OnUpdate(UnityModManager.ModEntry entry, float deltaTime)
     {
         if (!entry.Enabled || !settings.General.Enabled)
+        {
+            return;
+        }
+
+        if (!Game.HasInstance || Game.Instance.Player == null)
+        {
+            return;
+        }
+
+        if (Game.Instance.IsPaused || Game.Instance.IsFakePause)
+        {
+            return;
+        }
+
+        if (Game.Instance.CurrentMode != GameModeType.Default)
         {
             return;
         }
