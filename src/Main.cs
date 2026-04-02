@@ -9,11 +9,13 @@ public static class Main
     private static Harmony harmony;
     private static ModSettings settings;
     private static SettingsSnapshot lastSavedSnapshot;
+    private static ModLogger logger;
 
     public static bool Load(UnityModManager.ModEntry entry)
     {
         modEntry = entry;
         settings = UnityModManager.ModSettings.Load<ModSettings>(entry);
+        logger = new ModLogger(modEntry, settings);
         harmony = new Harmony(entry.Info.Id);
         lastSavedSnapshot = SettingsSnapshot.Capture(settings);
 
@@ -22,7 +24,7 @@ public static class Main
         entry.OnSaveGUI = OnSaveGUI;
         entry.OnUpdate = OnUpdate;
 
-        GetLogger().Info("Wrath Regen Mod loaded.");
+        logger.Info("Wrath Regen Mod loaded.");
         return true;
     }
 
@@ -31,12 +33,12 @@ public static class Main
         if (value)
         {
             harmony.PatchAll();
-            GetLogger().Info("Wrath Regen Mod enabled.");
+            logger.Info("Wrath Regen Mod enabled.");
         }
         else
         {
             harmony.UnpatchAll(entry.Info.Id);
-            GetLogger().Info("Wrath Regen Mod disabled.");
+            logger.Info("Wrath Regen Mod disabled.");
         }
 
         return true;
@@ -83,6 +85,6 @@ public static class Main
 
     private static ModLogger GetLogger()
     {
-        return new ModLogger(modEntry, settings);
+        return logger;
     }
 }
