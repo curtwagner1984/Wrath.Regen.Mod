@@ -20,8 +20,8 @@ public sealed class ModSettings : UnityModManager.ModSettings
 public sealed class GeneralSettings
 {
     public bool Enabled = true;
-    public bool MirrorModLogsToGameLog = false;
-    public LogLevel LogLevel = LogLevel.Info;
+    public bool MirrorModLogsToGameLog = true;
+    public LogLevel LogLevel = LogLevel.Error;
 }
 
 public sealed class HealthRegenSettings
