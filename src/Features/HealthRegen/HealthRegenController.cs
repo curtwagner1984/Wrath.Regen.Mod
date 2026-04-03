@@ -49,7 +49,8 @@ internal sealed class HealthRegenController : IController
 
             if (!loggedReadyMessage)
             {
-                logger.Info("HealthRegenController is running. Prototype healing uses Wrath's built-in rule system.");
+                if(logger.IsInfo)
+                    logger.Info("HealthRegenController is running. Prototype healing uses Wrath's built-in rule system.");
                 loggedReadyMessage = true;
             }
 
