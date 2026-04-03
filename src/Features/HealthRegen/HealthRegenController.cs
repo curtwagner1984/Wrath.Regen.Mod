@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Kingmaker.Controllers;
 using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums.Damage;
@@ -9,45 +10,76 @@ using Kingmaker.UnitLogic.Parts;
 
 namespace WrathRegenMod;
 
-internal static class HealthRegenController
+internal sealed class HealthRegenController : IController
 {
-    private static float elapsedSeconds;
-    private static bool loggedReadyMessage;
+    private readonly ModRuntime runtime;
+    private float elapsedSeconds;
+    private bool loggedReadyMessage;
 
-    public static void Tick(ModLogger logger, ModSettings settings, float deltaTime)
+    public HealthRegenController(ModRuntime runtime)
     {
-        if (!settings.HealthRegen.Enabled)
-        {
-            return;
-        }
+        this.runtime = runtime;
+    }
 
-        if (!loggedReadyMessage)
-        {
-            logger.Info("HealthRegenController is running. Prototype healing uses Wrath's built-in rule system.");
-            loggedReadyMessage = true;
-        }
+    public void Activate()
+    {
+    }
 
-        if (!Game.HasInstance || Game.Instance.Player == null)
-        {
-            return;
-        }
-
-        elapsedSeconds += deltaTime;
-        if (elapsedSeconds < settings.HealthRegen.TickIntervalSeconds)
-        {
-            return;
-        }
-
+    public void Deactivate()
+    {
         elapsedSeconds = 0f;
+        loggedReadyMessage = false;
+    }
 
-        if (settings.HealthRegen.OnlyRegenOutOfCombat && Game.Instance.Player.IsInCombat)
+    public void Tick()
+    {
+        if (!runtime.IsGameplayEnabled)
         {
-            if (logger.IsVerbose)
-                logger.Verbose("Health prototype skipped because the party is in combat.");
             return;
         }
 
-        RunPartyHealingTick(logger, settings);
+        var settings = runtime.Settings;
+        var logger = runtime.Logger;
+        try
+        {
+            if (!settings.HealthRegen.Enabled)
+            {
+                return;
+            }
+
+            if (!loggedReadyMessage)
+            {
+                logger.Info("HealthRegenController is running. Prototype healing uses Wrath's built-in rule system.");
+                loggedReadyMessage = true;
+            }
+
+            if (!Game.HasInstance || Game.Instance.Player == null)
+            {
+                return;
+            }
+
+            elapsedSeconds += Game.Instance.TimeController.GameDeltaTime;
+            if (elapsedSeconds < settings.HealthRegen.TickIntervalSeconds)
+            {
+                return;
+            }
+
+            elapsedSeconds = 0f;
+
+            if (settings.HealthRegen.OnlyRegenOutOfCombat && Game.Instance.Player.IsInCombat)
+            {
+                if (logger.IsVerbose)
+                    logger.Verbose("Health prototype skipped because the party is in combat.");
+                return;
+            }
+
+            RunPartyHealingTick(logger, settings);
+        }
+        catch (Exception ex)
+        {
+            if (logger.IsError)
+                logger.Error($"Unhandled exception in health regeneration controller: {ex}");
+        }
     }
 
     private static void RunPartyHealingTick(ModLogger logger, ModSettings settings)

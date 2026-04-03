@@ -7,8 +7,6 @@ internal sealed class SettingsSnapshot
     public bool GeneralEnabled;
     public bool MirrorLogsToGameLog;
     public LogLevel LogLevel;
-    public bool DiagnosticsEnabled;
-    public float DiagnosticsTickIntervalSeconds;
     public bool HealthRegenEnabled;
     public bool HealthRegenOutOfCombatOnly;
     public bool HealthRegenIncludePets;
@@ -51,8 +49,6 @@ internal sealed class SettingsSnapshot
             GeneralEnabled = settings.General.Enabled,
             MirrorLogsToGameLog = settings.General.MirrorModLogsToGameLog,
             LogLevel = settings.General.LogLevel,
-            DiagnosticsEnabled = settings.Diagnostics.EnablePartyDiagnostics,
-            DiagnosticsTickIntervalSeconds = settings.Diagnostics.TickIntervalSeconds,
             HealthRegenEnabled = settings.HealthRegen.Enabled,
             HealthRegenOutOfCombatOnly = settings.HealthRegen.OnlyRegenOutOfCombat,
             HealthRegenIncludePets = settings.HealthRegen.IncludePets,
@@ -110,16 +106,6 @@ internal sealed class SettingsSnapshot
         if (LogLevel != previous.LogLevel)
         {
             yield return $"General.LogLevel: {previous.LogLevel} -> {LogLevel}";
-        }
-
-        if (DiagnosticsEnabled != previous.DiagnosticsEnabled)
-        {
-            yield return $"Diagnostics.EnablePartyDiagnostics: {previous.DiagnosticsEnabled} -> {DiagnosticsEnabled}";
-        }
-
-        if (DiagnosticsTickIntervalSeconds != previous.DiagnosticsTickIntervalSeconds)
-        {
-            yield return $"Diagnostics.TickIntervalSeconds: {previous.DiagnosticsTickIntervalSeconds:0.###} -> {DiagnosticsTickIntervalSeconds:0.###}";
         }
 
         if (HealthRegenEnabled != previous.HealthRegenEnabled)

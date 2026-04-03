@@ -1,6 +1,4 @@
 using HarmonyLib;
-using Kingmaker;
-using Kingmaker.GameModes;
 using Kingmaker.PubSubSystem;
 using UnityModManagerNet;
 
@@ -13,6 +11,9 @@ public static class Main
     private static ModSettings settings;
     private static SettingsSnapshot lastSavedSnapshot;
     private static ModLogger logger;
+    private static ModRuntime runtime;
+    private static HealthRegenController healthRegenController;
+    private static ResourceRegenController resourceRegenController;
     private static ResourceRegenAreaHandler areaHandler;
 
     public static bool Load(UnityModManager.ModEntry entry)
@@ -20,13 +21,19 @@ public static class Main
         modEntry = entry;
         settings = UnityModManager.ModSettings.Load<ModSettings>(entry);
         logger = new ModLogger(modEntry, settings);
+        runtime = new ModRuntime(settings, logger);
+        runtime.SetModEnabled(entry.Enabled);
+        healthRegenController = new HealthRegenController(runtime);
+        resourceRegenController = new ResourceRegenController(runtime);
         harmony = new Harmony(entry.Info.Id);
         lastSavedSnapshot = SettingsSnapshot.Capture(settings);
 
         entry.OnToggle = OnToggle;
         entry.OnGUI = OnGUI;
         entry.OnSaveGUI = OnSaveGUI;
-        entry.OnUpdate = OnUpdate;
+
+        GameModeControllerRegistrar.RegisterDefault(healthRegenController);
+        GameModeControllerRegistrar.RegisterDefault(resourceRegenController);
 
         logger.Info("Wrath Regen Mod loaded.");
         return true;
@@ -36,13 +43,17 @@ public static class Main
     {
         if (value)
         {
+            runtime.SetModEnabled(true);
             harmony.PatchAll();
-            areaHandler = new ResourceRegenAreaHandler();
+            areaHandler = new ResourceRegenAreaHandler(resourceRegenController);
             EventBus.Subscribe(areaHandler);
             logger.Info("Wrath Regen Mod enabled.");
         }
         else
         {
+            runtime.SetModEnabled(false);
+            healthRegenController.Deactivate();
+            resourceRegenController.Deactivate();
             harmony.UnpatchAll(entry.Info.Id);
             if (areaHandler != null)
             {
@@ -72,42 +83,6 @@ public static class Main
         }
 
         lastSavedSnapshot = currentSnapshot;
-    }
-
-    private static void OnUpdate(UnityModManager.ModEntry entry, float deltaTime)
-    {
-        if (!entry.Enabled || !settings.General.Enabled)
-        {
-            return;
-        }
-
-        if (!Game.HasInstance || Game.Instance.Player == null)
-        {
-            return;
-        }
-
-        if (Game.Instance.IsPaused || Game.Instance.IsFakePause)
-        {
-            return;
-        }
-
-        if (Game.Instance.CurrentMode != GameModeType.Default)
-        {
-            return;
-        }
-
-        var logger = GetLogger();
-        try
-        {
-            PartyProbeController.Tick(logger, settings, deltaTime);
-            HealthRegenController.Tick(logger, settings, deltaTime);
-            ResourceRegenController.Tick(logger, settings, deltaTime);
-        }
-        catch (System.Exception ex)
-        {
-            if (logger.IsError)
-                logger.Error($"Unhandled exception in update loop: {ex}");
-        }
     }
 
     private static ModLogger GetLogger()
