@@ -7,3 +7,4 @@ obj/
 *.cache
 Wrath.Regen.Mod.local.props
 release/
+settings.local.json

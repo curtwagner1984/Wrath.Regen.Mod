@@ -71,6 +71,16 @@ internal static class ResourceRegenController
         }
     }
 
+    public static void ResetAllStrategies()
+    {
+        foreach (var strategy in Strategies)
+        {
+            strategy.Reset();
+        }
+
+        elapsedSeconds = 0f;
+    }
+
     private static string GetUnitName(Kingmaker.EntitySystem.Entities.UnitEntityData unit)
     {
         return string.IsNullOrWhiteSpace(unit.CharacterName) ? "<unnamed>" : unit.CharacterName;

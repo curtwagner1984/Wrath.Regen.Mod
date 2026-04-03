@@ -1,6 +1,7 @@
 using HarmonyLib;
 using Kingmaker;
 using Kingmaker.GameModes;
+using Kingmaker.PubSubSystem;
 using UnityModManagerNet;
 
 namespace WrathRegenMod;
@@ -12,6 +13,7 @@ public static class Main
     private static ModSettings settings;
     private static SettingsSnapshot lastSavedSnapshot;
     private static ModLogger logger;
+    private static ResourceRegenAreaHandler areaHandler;
 
     public static bool Load(UnityModManager.ModEntry entry)
     {
@@ -35,11 +37,18 @@ public static class Main
         if (value)
         {
             harmony.PatchAll();
+            areaHandler = new ResourceRegenAreaHandler();
+            EventBus.Subscribe(areaHandler);
             logger.Info("Wrath Regen Mod enabled.");
         }
         else
         {
             harmony.UnpatchAll(entry.Info.Id);
+            if (areaHandler != null)
+            {
+                EventBus.Unsubscribe(areaHandler);
+                areaHandler = null;
+            }
             logger.Info("Wrath Regen Mod disabled.");
         }
 

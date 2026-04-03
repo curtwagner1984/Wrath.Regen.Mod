@@ -7,7 +7,7 @@ namespace WrathRegenMod;
 
 internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
 {
-    private readonly Dictionary<string, float> elapsedByKey = new Dictionary<string, float>(StringComparer.Ordinal);
+    private readonly Dictionary<(Spellbook, int), float> elapsedByKey = new();
 
     public string Name => "SpontaneousSpellbookRegen";
 
@@ -41,6 +41,11 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
         }
     }
 
+    public void Reset()
+    {
+        elapsedByKey.Clear();
+    }
+
     private void TickSpellbook(UnitEntityData unit, Spellbook spellbook, RegenTickContext context)
     {
         for (var spellLevel = 1; spellLevel <= 9; spellLevel++)
@@ -60,17 +65,17 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
             var availableSlots = spellbook.GetSpontaneousSlots(spellLevel);
             if (availableSlots >= maxSlots)
             {
-                ClearElapsed(unit, spellbook, spellLevel);
+                elapsedByKey.Remove((spellbook, spellLevel));
                 continue;
             }
 
-            var timerKey = ResourceRegenHelpers.CreateTimerKey(Name, unit, spellbook, spellLevel);
-            elapsedByKey.TryGetValue(timerKey, out var elapsedSeconds);
+            var key = (spellbook, spellLevel);
+            elapsedByKey.TryGetValue(key, out var elapsedSeconds);
             elapsedSeconds += context.ElapsedSeconds;
 
             if (elapsedSeconds < intervalSeconds)
             {
-                elapsedByKey[timerKey] = elapsedSeconds;
+                elapsedByKey[key] = elapsedSeconds;
                 continue;
             }
 
@@ -82,19 +87,14 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
             if (restoredSlots <= 0)
             {
                 context.Logger.Verbose($"{Name} tried to restore a level {spellLevel} slot for {ResourceRegenHelpers.GetUnitName(unit)}, but the spellbook state did not change.");
-                elapsedByKey[timerKey] = 0f;
+                elapsedByKey[key] = 0f;
                 continue;
             }
 
             ResourceRegenFxPlayer.TryPlayOnUnit(context.Logger, context.Settings, unit);
             context.Logger.Info(
                 $"{Name} restored {restoredSlots} level {spellLevel} slot for {ResourceRegenHelpers.GetUnitName(unit)} ({beforeRestore}/{maxSlots} -> {afterRestore}/{maxSlots}).");
-            elapsedByKey[timerKey] = 0f;
+            elapsedByKey[key] = 0f;
         }
-    }
-
-    private void ClearElapsed(UnitEntityData unit, Spellbook spellbook, int spellLevel)
-    {
-        elapsedByKey.Remove(ResourceRegenHelpers.CreateTimerKey(Name, unit, spellbook, spellLevel));
     }
 }

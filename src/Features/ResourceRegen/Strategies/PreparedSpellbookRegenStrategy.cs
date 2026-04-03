@@ -8,7 +8,7 @@ namespace WrathRegenMod;
 
 internal sealed class PreparedSpellbookRegenStrategy : IResourceRegenStrategy
 {
-    private readonly Dictionary<string, float> elapsedByKey = new Dictionary<string, float>(StringComparer.Ordinal);
+    private readonly Dictionary<(Spellbook, int), float> elapsedByKey = new();
 
     public string Name => "PreparedSpellbookRegen";
 
@@ -42,6 +42,11 @@ internal sealed class PreparedSpellbookRegenStrategy : IResourceRegenStrategy
         }
     }
 
+    public void Reset()
+    {
+        elapsedByKey.Clear();
+    }
+
     private void TickSpellbook(UnitEntityData unit, Spellbook spellbook, RegenTickContext context)
     {
         for (var spellLevel = 1; spellLevel <= 9; spellLevel++)
@@ -64,17 +69,17 @@ internal sealed class PreparedSpellbookRegenStrategy : IResourceRegenStrategy
             var spentSlots = memorizedSlots.Where(slot => !slot.Available).ToList();
             if (spentSlots.Count == 0)
             {
-                ClearElapsed(unit, spellbook, spellLevel);
+                elapsedByKey.Remove((spellbook, spellLevel));
                 continue;
             }
 
-            var timerKey = ResourceRegenHelpers.CreateTimerKey(Name, unit, spellbook, spellLevel);
-            elapsedByKey.TryGetValue(timerKey, out var elapsedSeconds);
+            var key = (spellbook, spellLevel);
+            elapsedByKey.TryGetValue(key, out var elapsedSeconds);
             elapsedSeconds += context.ElapsedSeconds;
 
             if (elapsedSeconds < intervalSeconds)
             {
-                elapsedByKey[timerKey] = elapsedSeconds;
+                elapsedByKey[key] = elapsedSeconds;
                 context.Logger.Verbose(
                     $"{Name} is waiting for level {spellLevel} on {ResourceRegenHelpers.GetUnitName(unit)} ({elapsedSeconds:0.##}/{intervalSeconds:0.##} seconds, {spentSlots.Count} spent prepared slot(s)).");
                 continue;
@@ -97,24 +102,19 @@ internal sealed class PreparedSpellbookRegenStrategy : IResourceRegenStrategy
             {
                 context.Logger.Verbose(
                     $"{Name} tried to restore level {spellLevel} slot #{chosenSlot.Index} ({spellName}) for {ResourceRegenHelpers.GetUnitName(unit)}, but the prepared spellbook state did not change.");
-                elapsedByKey[timerKey] = 0f;
+                elapsedByKey[key] = 0f;
                 continue;
             }
 
             ResourceRegenFxPlayer.TryPlayOnUnit(context.Logger, context.Settings, unit);
             context.Logger.Info(
                 $"{Name} restored level {spellLevel} slot #{chosenSlot.Index} ({spellName}) for {ResourceRegenHelpers.GetUnitName(unit)} ({beforeAvailable}/{memorizedSlots.Count} -> {afterAvailable}/{memorizedSlots.Count} available prepared slot(s)).");
-            elapsedByKey[timerKey] = 0f;
+            elapsedByKey[key] = 0f;
         }
     }
 
     private static int CountAvailableSlots(List<SpellSlot> slots)
     {
         return slots.Count(slot => slot.Available);
-    }
-
-    private void ClearElapsed(UnitEntityData unit, Spellbook spellbook, int spellLevel)
-    {
-        elapsedByKey.Remove(ResourceRegenHelpers.CreateTimerKey(Name, unit, spellbook, spellLevel));
     }
 }
