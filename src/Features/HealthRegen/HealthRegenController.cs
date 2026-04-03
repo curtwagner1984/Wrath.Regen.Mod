@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums.Damage;
@@ -53,21 +52,22 @@ internal static class HealthRegenController
 
     private static void RunPartyHealingTick(ModLogger logger, ModSettings settings)
     {
-        var targets = GetConfiguredTargets(settings).ToList();
-        if (targets.Count == 0)
-        {
-            if (logger.IsVerbose)
-                logger.Verbose("Health prototype skipped because no eligible units were available.");
-            return;
-        }
-
         var healedUnits = 0;
-        foreach (var unit in targets)
+        var eligibleUnits = 0;
+        foreach (var unit in GetConfiguredTargets(settings))
         {
+            eligibleUnits++;
             if (TryHealUnit(logger, settings, unit))
             {
                 healedUnits++;
             }
+        }
+
+        if (eligibleUnits == 0)
+        {
+            if (logger.IsVerbose)
+                logger.Verbose("Health prototype skipped because no eligible units were available.");
+            return;
         }
 
         if (healedUnits == 0)
