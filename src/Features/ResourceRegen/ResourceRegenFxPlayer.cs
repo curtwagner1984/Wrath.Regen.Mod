@@ -11,7 +11,7 @@ internal static class ResourceRegenFxPlayer
 {
     public static void TryPlayOnUnit(ModLogger logger, ModSettings settings, UnitEntityData unit)
     {
-        if (!settings.ResourceRegen.ShowVisualEffects || unit?.View == null)
+        if (!settings.ResourceRegen.ShowVisualEffects || unit.View == null)
         {
             return;
         }
