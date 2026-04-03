@@ -19,7 +19,8 @@ internal static class ResourceRegenFxPlayer
         var prefab = GetPrefab(settings.ResourceRegen.VisualEffectStyle);
         if (prefab == null)
         {
-            logger.Verbose("Resource regen visual effect was enabled, but no built-in prefab was available for the selected style.");
+            if (logger.IsVerbose)
+                logger.Verbose("Resource regen visual effect was enabled, but no built-in prefab was available for the selected style.");
             return;
         }
 

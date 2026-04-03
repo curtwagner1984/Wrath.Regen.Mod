@@ -24,6 +24,7 @@ internal static class SettingsRenderer
 
     private static readonly string[] LogLevelLabels =
     {
+        "None",
         "Error",
         "Info",
         "Verbose"
@@ -364,7 +365,9 @@ internal static class SettingsRenderer
         using (new GUILayout.HorizontalScope())
         {
             GUILayout.Label(new GUIContent(label, tooltip), GUILayout.Width(240f));
-            return (LogLevel)GUILayout.Toolbar((int)value, labels, GUILayout.MinWidth(240f));
+            var toolbarIndex = (int)value + 1;
+            var selected = GUILayout.Toolbar(toolbarIndex, labels, GUILayout.MinWidth(240f));
+            return (LogLevel)(selected - 1);
         }
     }
 

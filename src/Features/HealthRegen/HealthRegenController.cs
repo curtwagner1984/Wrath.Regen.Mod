@@ -43,7 +43,8 @@ internal static class HealthRegenController
 
         if (settings.HealthRegen.OnlyRegenOutOfCombat && Game.Instance.Player.IsInCombat)
         {
-            logger.Verbose("Health prototype skipped because the party is in combat.");
+            if (logger.IsVerbose)
+                logger.Verbose("Health prototype skipped because the party is in combat.");
             return;
         }
 
@@ -55,7 +56,8 @@ internal static class HealthRegenController
         var targets = GetConfiguredTargets(settings).ToList();
         if (targets.Count == 0)
         {
-            logger.Verbose("Health prototype skipped because no eligible units were available.");
+            if (logger.IsVerbose)
+                logger.Verbose("Health prototype skipped because no eligible units were available.");
             return;
         }
 
@@ -70,7 +72,8 @@ internal static class HealthRegenController
 
         if (healedUnits == 0)
         {
-            logger.Verbose("Health prototype found no party members who needed healing.");
+            if (logger.IsVerbose)
+                logger.Verbose("Health prototype found no party members who needed healing.");
         }
     }
 
@@ -109,11 +112,13 @@ internal static class HealthRegenController
 
         if (healRule.Value <= 0)
         {
-            logger.Verbose($"Health prototype attempted to heal {name}, but no HP was restored.");
+            if (logger.IsVerbose)
+                logger.Verbose($"Health prototype attempted to heal {name}, but no HP was restored.");
             return false;
         }
 
-        logger.Info($"Health prototype restored {healRule.Value} HP to {name}.");
+        if (logger.IsInfo)
+            logger.Info($"Health prototype restored {healRule.Value} HP to {name}.");
         return true;
     }
 
@@ -131,11 +136,13 @@ internal static class HealthRegenController
         var restored = Math.Max(0, missingHp - unit.Damage);
         if (restored <= 0)
         {
-            logger.Verbose($"Health prototype attempted undead restoration on {name}, but no HP was restored.");
+            if (logger.IsVerbose)
+                logger.Verbose($"Health prototype attempted undead restoration on {name}, but no HP was restored.");
             return false;
         }
 
-        logger.Info($"Health prototype restored {restored} HP to undead unit {name} via negative energy.");
+        if (logger.IsInfo)
+            logger.Info($"Health prototype restored {restored} HP to undead unit {name} via negative energy.");
         return true;
     }
 

@@ -26,7 +26,8 @@ internal static class PartyProbeController
         {
             if (!loggedMissingGameMessage)
             {
-                logger.Verbose("Diagnostics skipped because game instance or player data is not ready yet.");
+                if (logger.IsVerbose)
+                    logger.Verbose("Diagnostics skipped because game instance or player data is not ready yet.");
                 loggedMissingGameMessage = true;
             }
 
@@ -53,7 +54,8 @@ internal static class PartyProbeController
             return;
         }
 
-        logger.Verbose($"Party snapshot: {party.Count} unit(s).");
+        if (logger.IsVerbose)
+            logger.Verbose($"Party snapshot: {party.Count} unit(s).");
 
         if (!settings.Diagnostics.LogVerbose)
         {
@@ -82,7 +84,8 @@ internal static class PartyProbeController
         var isUndead = unit.Descriptor?.IsUndead ?? false;
         var name = string.IsNullOrWhiteSpace(unit.CharacterName) ? "<unnamed>" : unit.CharacterName;
 
-        logger.Verbose(
-            $"Party unit: {name} | HP {currentHp}/{maxHp} | InCombat={inCombat} | Dead={isDead} | Unconscious={isUnconscious} | Undead={isUndead}");
+        if (logger.IsVerbose)
+            logger.Verbose(
+                $"Party unit: {name} | HP {currentHp}/{maxHp} | InCombat={inCombat} | Dead={isDead} | Unconscious={isUnconscious} | Undead={isUndead}");
     }
 }
