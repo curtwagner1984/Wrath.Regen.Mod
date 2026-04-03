@@ -66,7 +66,8 @@ internal static class ResourceRegenController
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"{strategy.Name} failed for {GetUnitName(unit)}: {ex}");
+                    if (logger.IsError)
+                        logger.Error($"{strategy.Name} failed for {GetUnitName(unit)}: {ex}");
                 }
             }
         }

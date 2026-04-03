@@ -81,7 +81,8 @@ internal static class HealthRegenController
     {
         if (unit == null || unit.State == null || unit.Descriptor == null)
         {
-            logger.Error("Health regen encountered a unit with missing state or descriptor.");
+            if (logger.IsError)
+                logger.Error("Health regen encountered a unit with missing state or descriptor.");
             return false;
         }
 

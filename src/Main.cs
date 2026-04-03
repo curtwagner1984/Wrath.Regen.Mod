@@ -105,7 +105,8 @@ public static class Main
         }
         catch (System.Exception ex)
         {
-            logger.Error($"Unhandled exception in update loop: {ex}");
+            if (logger.IsError)
+                logger.Error($"Unhandled exception in update loop: {ex}");
         }
     }
 

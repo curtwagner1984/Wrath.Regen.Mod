@@ -50,7 +50,8 @@ internal static class PartyProbeController
         var party = Game.Instance.Player.Party;
         if (party == null)
         {
-            logger.Error("Diagnostics could not read the party list because it was null.");
+            if (logger.IsError)
+                logger.Error("Diagnostics could not read the party list because it was null.");
             return;
         }
 
@@ -72,7 +73,8 @@ internal static class PartyProbeController
     {
         if (unit == null)
         {
-            logger.Error("Diagnostics encountered a null party member entry.");
+            if (logger.IsError)
+                logger.Error("Diagnostics encountered a null party member entry.");
             return;
         }
 

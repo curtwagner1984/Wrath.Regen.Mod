@@ -20,7 +20,8 @@ internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrate
 
         if (unit == null || unit.Descriptor?.Resources == null)
         {
-            context.Logger.Error($"{Name} encountered a unit with missing resource state.");
+            if (context.Logger.IsError)
+                context.Logger.Error($"{Name} encountered a unit with missing resource state.");
             return;
         }
 

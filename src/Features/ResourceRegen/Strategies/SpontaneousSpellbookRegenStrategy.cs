@@ -20,7 +20,8 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
 
         if (unit == null || unit.Descriptor == null)
         {
-            context.Logger.Error($"{Name} encountered a unit with a missing descriptor.");
+            if (context.Logger.IsError)
+                context.Logger.Error($"{Name} encountered a unit with a missing descriptor.");
             return;
         }
 
