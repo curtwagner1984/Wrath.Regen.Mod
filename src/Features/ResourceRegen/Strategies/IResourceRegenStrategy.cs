@@ -7,4 +7,6 @@ internal interface IResourceRegenStrategy
     string Name { get; }
 
     void Tick(UnitEntityData unit, RegenTickContext context);
+
+    void Reset();
 }

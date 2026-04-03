@@ -7,7 +7,7 @@ namespace WrathRegenMod;
 
 internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrategy
 {
-    private readonly Dictionary<string, float> elapsedByKey = new Dictionary<string, float>(StringComparer.Ordinal);
+    private readonly Dictionary<(UnitEntityData, BlueprintAbilityResource, int), float> elapsedByKey = new();
 
     public string Name => "GenericAbilityResourceRegen";
 
@@ -36,6 +36,11 @@ internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrate
         }
     }
 
+    public void Reset()
+    {
+        elapsedByKey.Clear();
+    }
+
     private void TickResource(UnitEntityData unit, BlueprintAbilityResource resource, RegenTickContext context)
     {
         var currentAmount = unit.Descriptor.Resources.GetResourceAmount(resource);
@@ -60,13 +65,13 @@ internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrate
             return;
         }
 
-        var timerKey = ResourceRegenHelpers.CreateTimerKey(Name, unit, resource, resourceTier);
-        elapsedByKey.TryGetValue(timerKey, out var elapsedSeconds);
+        var key = (unit, resource, resourceTier);
+        elapsedByKey.TryGetValue(key, out var elapsedSeconds);
         elapsedSeconds += context.ElapsedSeconds;
 
         if (elapsedSeconds < intervalSeconds)
         {
-            elapsedByKey[timerKey] = elapsedSeconds;
+            elapsedByKey[key] = elapsedSeconds;
             context.Logger.Verbose(
                 $"{Name} is waiting for {ResourceRegenHelpers.GetResourceName(resource)} on {ResourceRegenHelpers.GetUnitName(unit)} (tier {resourceTier}, max {maxAmount}, {elapsedSeconds:0.##}/{intervalSeconds:0.##} seconds, {currentAmount}/{maxAmount}).");
             return;
@@ -81,21 +86,21 @@ internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrate
         {
             context.Logger.Verbose(
                 $"{Name} tried to restore {ResourceRegenHelpers.GetResourceName(resource)} for {ResourceRegenHelpers.GetUnitName(unit)} (tier {resourceTier}, max {maxAmount}), but the resource state did not change.");
-            elapsedByKey[timerKey] = 0f;
+            elapsedByKey[key] = 0f;
             return;
         }
 
         ResourceRegenFxPlayer.TryPlayOnUnit(context.Logger, context.Settings, unit);
         context.Logger.Info(
             $"{Name} restored {restoredAmount} charge(s) to {ResourceRegenHelpers.GetResourceName(resource)} for {ResourceRegenHelpers.GetUnitName(unit)} (tier {resourceTier}, {beforeAmount}/{maxAmount} -> {afterAmount}/{maxAmount}).");
-        elapsedByKey[timerKey] = 0f;
+        elapsedByKey[key] = 0f;
     }
 
     private void ClearElapsed(UnitEntityData unit, BlueprintAbilityResource resource)
     {
         for (var tier = 1; tier <= 6; tier++)
         {
-            elapsedByKey.Remove(ResourceRegenHelpers.CreateTimerKey(Name, unit, resource, tier));
+            elapsedByKey.Remove((unit, resource, tier));
         }
     }
 }
