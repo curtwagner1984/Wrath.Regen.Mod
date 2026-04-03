@@ -62,6 +62,7 @@ public sealed class ResourceRegenSettings
     public float Level7IntervalSeconds = 120.0f;
     public float Level8IntervalSeconds = 150.0f;
     public float Level9IntervalSeconds = 180.0f;
+    public float Level10IntervalSeconds = 210.0f;
     public int GenericResourceRestoreAmount = 1;
     public float GenericTier1IntervalSeconds = 30.0f;
     public float GenericTier2IntervalSeconds = 40.0f;
@@ -95,8 +96,10 @@ public sealed class ResourceRegenSettings
                 return Level8IntervalSeconds;
             case 9:
                 return Level9IntervalSeconds;
+            case 10:
+                return Level10IntervalSeconds;
             default:
-                return spellLevel > 9 ? Level9IntervalSeconds : 0f;
+                return spellLevel > 10 ? Level10IntervalSeconds : 0f;
         }
     }
 

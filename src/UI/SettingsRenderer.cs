@@ -50,6 +50,7 @@ internal static class SettingsRenderer
     private static string resourceLevel7IntervalText;
     private static string resourceLevel8IntervalText;
     private static string resourceLevel9IntervalText;
+    private static string resourceLevel10IntervalText;
     private static string resourceGenericRestoreAmountText;
     private static string resourceGenericTier1IntervalText;
     private static string resourceGenericTier2IntervalText;
@@ -278,6 +279,12 @@ internal static class SettingsRenderer
             resourceLevel9IntervalText,
             value => resourceLevel9IntervalText = value,
             settings.ResourceRegen.Level9IntervalSeconds);
+        DrawSpellLevelIntervalField(
+            settings,
+            10,
+            resourceLevel10IntervalText,
+            value => resourceLevel10IntervalText = value,
+            settings.ResourceRegen.Level10IntervalSeconds);
 
         GUILayout.Space(8f);
         Section("Generic Ability Resources");
@@ -487,6 +494,9 @@ internal static class SettingsRenderer
             case 9:
                 settings.ResourceRegen.Level9IntervalSeconds = updatedValue;
                 break;
+            case 10:
+                settings.ResourceRegen.Level10IntervalSeconds = updatedValue;
+                break;
         }
     }
 
@@ -554,6 +564,7 @@ internal static class SettingsRenderer
         resourceLevel7IntervalText ??= settings.ResourceRegen.Level7IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         resourceLevel8IntervalText ??= settings.ResourceRegen.Level8IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         resourceLevel9IntervalText ??= settings.ResourceRegen.Level9IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
+        resourceLevel10IntervalText ??= settings.ResourceRegen.Level10IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         resourceGenericRestoreAmountText ??= settings.ResourceRegen.GenericResourceRestoreAmount.ToString(CultureInfo.InvariantCulture);
         resourceGenericTier1IntervalText ??= settings.ResourceRegen.GenericTier1IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         resourceGenericTier2IntervalText ??= settings.ResourceRegen.GenericTier2IntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
