@@ -14,8 +14,19 @@ internal sealed class ModLogger
         this.settings = settings;
     }
 
+    public bool IsError => ShouldLog(LogLevel.Error);
+
+    public bool IsInfo => ShouldLog(LogLevel.Info);
+
+    public bool IsVerbose => ShouldLog(LogLevel.Verbose);
+
     public void Error(string message)
     {
+        if (!ShouldLog(LogLevel.Error))
+        {
+            return;
+        }
+
         modEntry.Logger.Error(message);
         MirrorToGameLog($"[Error] {message}");
     }

@@ -26,7 +26,8 @@ internal static class PartyProbeController
         {
             if (!loggedMissingGameMessage)
             {
-                logger.Verbose("Diagnostics skipped because game instance or player data is not ready yet.");
+                if (logger.IsVerbose)
+                    logger.Verbose("Diagnostics skipped because game instance or player data is not ready yet.");
                 loggedMissingGameMessage = true;
             }
 
@@ -49,11 +50,13 @@ internal static class PartyProbeController
         var party = Game.Instance.Player.Party;
         if (party == null)
         {
-            logger.Error("Diagnostics could not read the party list because it was null.");
+            if (logger.IsError)
+                logger.Error("Diagnostics could not read the party list because it was null.");
             return;
         }
 
-        logger.Verbose($"Party snapshot: {party.Count} unit(s).");
+        if (logger.IsVerbose)
+            logger.Verbose($"Party snapshot: {party.Count} unit(s).");
 
         if (!settings.Diagnostics.LogVerbose)
         {
@@ -70,7 +73,8 @@ internal static class PartyProbeController
     {
         if (unit == null)
         {
-            logger.Error("Diagnostics encountered a null party member entry.");
+            if (logger.IsError)
+                logger.Error("Diagnostics encountered a null party member entry.");
             return;
         }
 
@@ -82,7 +86,8 @@ internal static class PartyProbeController
         var isUndead = unit.Descriptor?.IsUndead ?? false;
         var name = string.IsNullOrWhiteSpace(unit.CharacterName) ? "<unnamed>" : unit.CharacterName;
 
-        logger.Verbose(
-            $"Party unit: {name} | HP {currentHp}/{maxHp} | InCombat={inCombat} | Dead={isDead} | Unconscious={isUnconscious} | Undead={isUndead}");
+        if (logger.IsVerbose)
+            logger.Verbose(
+                $"Party unit: {name} | HP {currentHp}/{maxHp} | InCombat={inCombat} | Dead={isDead} | Unconscious={isUnconscious} | Undead={isUndead}");
     }
 }

@@ -20,7 +20,8 @@ internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrate
 
         if (unit == null || unit.Descriptor?.Resources == null)
         {
-            context.Logger.Error($"{Name} encountered a unit with missing resource state.");
+            if (context.Logger.IsError)
+                context.Logger.Error($"{Name} encountered a unit with missing resource state.");
             return;
         }
 
@@ -28,7 +29,8 @@ internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrate
         {
             if (!(blueprint is BlueprintAbilityResource abilityResource))
             {
-                context.Logger.Verbose($"{Name} skipped non-standard resource {ResourceRegenHelpers.GetResourceName(blueprint)} on {ResourceRegenHelpers.GetUnitName(unit)}.");
+                if (context.Logger.IsVerbose)
+                    context.Logger.Verbose($"{Name} skipped non-standard resource {ResourceRegenHelpers.GetResourceName(blueprint)} on {ResourceRegenHelpers.GetUnitName(unit)}.");
                 continue;
             }
 
@@ -60,7 +62,8 @@ internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrate
         var intervalSeconds = context.Settings.ResourceRegen.GetIntervalSecondsForGenericResourceMax(maxAmount);
         if (resourceTier <= 0 || intervalSeconds <= 0f)
         {
-            context.Logger.Verbose($"{Name} disabled regeneration for {ResourceRegenHelpers.GetResourceName(resource)} on {ResourceRegenHelpers.GetUnitName(unit)} because its tier is disabled.");
+            if (context.Logger.IsVerbose)
+                context.Logger.Verbose($"{Name} disabled regeneration for {ResourceRegenHelpers.GetResourceName(resource)} on {ResourceRegenHelpers.GetUnitName(unit)} because its tier is disabled.");
             ClearElapsed(unit, resource);
             return;
         }
@@ -72,8 +75,9 @@ internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrate
         if (elapsedSeconds < intervalSeconds)
         {
             elapsedByKey[key] = elapsedSeconds;
-            context.Logger.Verbose(
-                $"{Name} is waiting for {ResourceRegenHelpers.GetResourceName(resource)} on {ResourceRegenHelpers.GetUnitName(unit)} (tier {resourceTier}, max {maxAmount}, {elapsedSeconds:0.##}/{intervalSeconds:0.##} seconds, {currentAmount}/{maxAmount}).");
+            if (context.Logger.IsVerbose)
+                context.Logger.Verbose(
+                    $"{Name} is waiting for {ResourceRegenHelpers.GetResourceName(resource)} on {ResourceRegenHelpers.GetUnitName(unit)} (tier {resourceTier}, max {maxAmount}, {elapsedSeconds:0.##}/{intervalSeconds:0.##} seconds, {currentAmount}/{maxAmount}).");
             return;
         }
 
@@ -84,15 +88,17 @@ internal sealed class GenericAbilityResourceRegenStrategy : IResourceRegenStrate
 
         if (restoredAmount <= 0)
         {
-            context.Logger.Verbose(
-                $"{Name} tried to restore {ResourceRegenHelpers.GetResourceName(resource)} for {ResourceRegenHelpers.GetUnitName(unit)} (tier {resourceTier}, max {maxAmount}), but the resource state did not change.");
+            if (context.Logger.IsVerbose)
+                context.Logger.Verbose(
+                    $"{Name} tried to restore {ResourceRegenHelpers.GetResourceName(resource)} for {ResourceRegenHelpers.GetUnitName(unit)} (tier {resourceTier}, max {maxAmount}), but the resource state did not change.");
             elapsedByKey[key] = 0f;
             return;
         }
 
         ResourceRegenFxPlayer.TryPlayOnUnit(context.Logger, context.Settings, unit);
-        context.Logger.Info(
-            $"{Name} restored {restoredAmount} charge(s) to {ResourceRegenHelpers.GetResourceName(resource)} for {ResourceRegenHelpers.GetUnitName(unit)} (tier {resourceTier}, {beforeAmount}/{maxAmount} -> {afterAmount}/{maxAmount}).");
+        if (context.Logger.IsInfo)
+            context.Logger.Info(
+                $"{Name} restored {restoredAmount} charge(s) to {ResourceRegenHelpers.GetResourceName(resource)} for {ResourceRegenHelpers.GetUnitName(unit)} (tier {resourceTier}, {beforeAmount}/{maxAmount} -> {afterAmount}/{maxAmount}).");
         elapsedByKey[key] = 0f;
     }
 

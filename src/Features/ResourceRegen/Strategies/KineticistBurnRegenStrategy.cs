@@ -20,7 +20,8 @@ internal sealed class KineticistBurnRegenStrategy : IResourceRegenStrategy
 
         if (unit?.Descriptor == null)
         {
-            context.Logger.Error($"{Name} encountered a unit with a missing descriptor.");
+            if (context.Logger.IsError)
+                context.Logger.Error($"{Name} encountered a unit with a missing descriptor.");
             return;
         }
 
@@ -35,7 +36,8 @@ internal sealed class KineticistBurnRegenStrategy : IResourceRegenStrategy
         if (currentBurn <= floor)
         {
             elapsedByUnit.Remove(unit);
-            context.Logger.Verbose($"{Name} skipped {ResourceRegenHelpers.GetUnitName(unit)} because current burn {currentBurn} is already at or below the floor {floor}.");
+            if (context.Logger.IsVerbose)
+                context.Logger.Verbose($"{Name} skipped {ResourceRegenHelpers.GetUnitName(unit)} because current burn {currentBurn} is already at or below the floor {floor}.");
             return;
         }
 
@@ -43,7 +45,8 @@ internal sealed class KineticistBurnRegenStrategy : IResourceRegenStrategy
         if (intervalSeconds <= 0f)
         {
             elapsedByUnit.Remove(unit);
-            context.Logger.Verbose($"{Name} is disabled for {ResourceRegenHelpers.GetUnitName(unit)} because the restore interval is set to 0.");
+            if (context.Logger.IsVerbose)
+                context.Logger.Verbose($"{Name} is disabled for {ResourceRegenHelpers.GetUnitName(unit)} because the restore interval is set to 0.");
             return;
         }
 
@@ -53,8 +56,9 @@ internal sealed class KineticistBurnRegenStrategy : IResourceRegenStrategy
         if (elapsedSeconds < intervalSeconds)
         {
             elapsedByUnit[unit] = elapsedSeconds;
-            context.Logger.Verbose(
-                $"{Name} is waiting for {ResourceRegenHelpers.GetUnitName(unit)} ({elapsedSeconds:0.##}/{intervalSeconds:0.##} seconds, burn {currentBurn}, floor {floor}, max burn {kineticistPart.MaxBurn}).");
+            if (context.Logger.IsVerbose)
+                context.Logger.Verbose(
+                    $"{Name} is waiting for {ResourceRegenHelpers.GetUnitName(unit)} ({elapsedSeconds:0.##}/{intervalSeconds:0.##} seconds, burn {currentBurn}, floor {floor}, max burn {kineticistPart.MaxBurn}).");
             return;
         }
 
@@ -65,15 +69,17 @@ internal sealed class KineticistBurnRegenStrategy : IResourceRegenStrategy
 
         if (healedBurn <= 0)
         {
-            context.Logger.Verbose(
-                $"{Name} tried to heal burn for {ResourceRegenHelpers.GetUnitName(unit)} (burn {beforeBurn}, floor {floor}), but the Kineticist burn state did not change.");
+            if (context.Logger.IsVerbose)
+                context.Logger.Verbose(
+                    $"{Name} tried to heal burn for {ResourceRegenHelpers.GetUnitName(unit)} (burn {beforeBurn}, floor {floor}), but the Kineticist burn state did not change.");
             elapsedByUnit[unit] = 0f;
             return;
         }
 
         ResourceRegenFxPlayer.TryPlayOnUnit(context.Logger, context.Settings, unit);
-        context.Logger.Info(
-            $"{Name} healed {healedBurn} burn from {ResourceRegenHelpers.GetUnitName(unit)} ({beforeBurn} -> {afterBurn}, floor {floor}, max burn {kineticistPart.MaxBurn}).");
+        if (context.Logger.IsInfo)
+            context.Logger.Info(
+                $"{Name} healed {healedBurn} burn from {ResourceRegenHelpers.GetUnitName(unit)} ({beforeBurn} -> {afterBurn}, floor {floor}, max burn {kineticistPart.MaxBurn}).");
         elapsedByUnit[unit] = 0f;
     }
 

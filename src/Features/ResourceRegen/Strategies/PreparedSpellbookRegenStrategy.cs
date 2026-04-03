@@ -21,7 +21,8 @@ internal sealed class PreparedSpellbookRegenStrategy : IResourceRegenStrategy
 
         if (unit == null || unit.Descriptor == null)
         {
-            context.Logger.Error($"{Name} encountered a unit with a missing descriptor.");
+            if (context.Logger.IsError)
+                context.Logger.Error($"{Name} encountered a unit with a missing descriptor.");
             return;
         }
 
@@ -80,8 +81,9 @@ internal sealed class PreparedSpellbookRegenStrategy : IResourceRegenStrategy
             if (elapsedSeconds < intervalSeconds)
             {
                 elapsedByKey[key] = elapsedSeconds;
-                context.Logger.Verbose(
-                    $"{Name} is waiting for level {spellLevel} on {ResourceRegenHelpers.GetUnitName(unit)} ({elapsedSeconds:0.##}/{intervalSeconds:0.##} seconds, {spentSlots.Count} spent prepared slot(s)).");
+                if (context.Logger.IsVerbose)
+                    context.Logger.Verbose(
+                        $"{Name} is waiting for level {spellLevel} on {ResourceRegenHelpers.GetUnitName(unit)} ({elapsedSeconds:0.##}/{intervalSeconds:0.##} seconds, {spentSlots.Count} spent prepared slot(s)).");
                 continue;
             }
 
@@ -100,15 +102,17 @@ internal sealed class PreparedSpellbookRegenStrategy : IResourceRegenStrategy
 
             if (restoredSlots <= 0)
             {
-                context.Logger.Verbose(
-                    $"{Name} tried to restore level {spellLevel} slot #{chosenSlot.Index} ({spellName}) for {ResourceRegenHelpers.GetUnitName(unit)}, but the prepared spellbook state did not change.");
+                if (context.Logger.IsVerbose)
+                    context.Logger.Verbose(
+                        $"{Name} tried to restore level {spellLevel} slot #{chosenSlot.Index} ({spellName}) for {ResourceRegenHelpers.GetUnitName(unit)}, but the prepared spellbook state did not change.");
                 elapsedByKey[key] = 0f;
                 continue;
             }
 
             ResourceRegenFxPlayer.TryPlayOnUnit(context.Logger, context.Settings, unit);
-            context.Logger.Info(
-                $"{Name} restored level {spellLevel} slot #{chosenSlot.Index} ({spellName}) for {ResourceRegenHelpers.GetUnitName(unit)} ({beforeAvailable}/{memorizedSlots.Count} -> {afterAvailable}/{memorizedSlots.Count} available prepared slot(s)).");
+            if (context.Logger.IsInfo)
+                context.Logger.Info(
+                    $"{Name} restored level {spellLevel} slot #{chosenSlot.Index} ({spellName}) for {ResourceRegenHelpers.GetUnitName(unit)} ({beforeAvailable}/{memorizedSlots.Count} -> {afterAvailable}/{memorizedSlots.Count} available prepared slot(s)).");
             elapsedByKey[key] = 0f;
         }
     }

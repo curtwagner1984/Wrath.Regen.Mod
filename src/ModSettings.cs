@@ -165,6 +165,7 @@ public enum ResourceRegenVisualEffectStyle
 
 public enum LogLevel
 {
+    None = -1,
     Error = 0,
     Info = 1,
     Verbose = 2

@@ -45,7 +45,8 @@ internal static class ResourceRegenController
 
         if (settings.ResourceRegen.OnlyRegenOutOfCombat && Game.Instance.Player.IsInCombat)
         {
-            logger.Verbose("Resource regeneration skipped because the party is in combat.");
+            if (logger.IsVerbose)
+                logger.Verbose("Resource regeneration skipped because the party is in combat.");
             return;
         }
 
@@ -65,7 +66,8 @@ internal static class ResourceRegenController
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"{strategy.Name} failed for {GetUnitName(unit)}: {ex}");
+                    if (logger.IsError)
+                        logger.Error($"{strategy.Name} failed for {GetUnitName(unit)}: {ex}");
                 }
             }
         }

@@ -20,7 +20,8 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
 
         if (unit == null || unit.Descriptor == null)
         {
-            context.Logger.Error($"{Name} encountered a unit with a missing descriptor.");
+            if (context.Logger.IsError)
+                context.Logger.Error($"{Name} encountered a unit with a missing descriptor.");
             return;
         }
 
@@ -86,14 +87,16 @@ internal sealed class SpontaneousSpellbookRegenStrategy : IResourceRegenStrategy
 
             if (restoredSlots <= 0)
             {
-                context.Logger.Verbose($"{Name} tried to restore a level {spellLevel} slot for {ResourceRegenHelpers.GetUnitName(unit)}, but the spellbook state did not change.");
+                if (context.Logger.IsVerbose)
+                    context.Logger.Verbose($"{Name} tried to restore a level {spellLevel} slot for {ResourceRegenHelpers.GetUnitName(unit)}, but the spellbook state did not change.");
                 elapsedByKey[key] = 0f;
                 continue;
             }
 
             ResourceRegenFxPlayer.TryPlayOnUnit(context.Logger, context.Settings, unit);
-            context.Logger.Info(
-                $"{Name} restored {restoredSlots} level {spellLevel} slot for {ResourceRegenHelpers.GetUnitName(unit)} ({beforeRestore}/{maxSlots} -> {afterRestore}/{maxSlots}).");
+            if (context.Logger.IsInfo)
+                context.Logger.Info(
+                    $"{Name} restored {restoredSlots} level {spellLevel} slot for {ResourceRegenHelpers.GetUnitName(unit)} ({beforeRestore}/{maxSlots} -> {afterRestore}/{maxSlots}).");
             elapsedByKey[key] = 0f;
         }
     }
