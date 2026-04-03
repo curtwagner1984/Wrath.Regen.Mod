@@ -1,6 +1,6 @@
 namespace WrathRegenMod;
 
-internal sealed class RegenTickContext
+internal readonly struct RegenTickContext
 {
     public RegenTickContext(ModLogger logger, ModSettings settings, float elapsedSeconds)
     {

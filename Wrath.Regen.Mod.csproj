@@ -20,6 +20,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" IncludeAssets="build;contentfiles" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>$(WrathManagedDir)\UnityModManager\0Harmony.dll</HintPath>
       <Private>false</Private>
@@ -27,6 +31,7 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>$(WrathManagedDir)\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
+      <Publicize>true</Publicize>
     </Reference>
     <Reference Include="UnityModManager">
       <HintPath>$(WrathManagedDir)\UnityModManager\UnityModManager.dll</HintPath>

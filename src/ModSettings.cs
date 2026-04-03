@@ -8,7 +8,6 @@ namespace WrathRegenMod;
 public sealed class ModSettings : UnityModManager.ModSettings
 {
     public GeneralSettings General = new GeneralSettings();
-    public DiagnosticsSettings Diagnostics = new DiagnosticsSettings();
     public HealthRegenSettings HealthRegen = new HealthRegenSettings();
     public ResourceRegenSettings ResourceRegen = new ResourceRegenSettings();
 
@@ -23,13 +22,6 @@ public sealed class GeneralSettings
     public bool Enabled = true;
     public bool MirrorModLogsToGameLog = false;
     public LogLevel LogLevel = LogLevel.Info;
-}
-
-public sealed class DiagnosticsSettings
-{
-    public bool EnablePartyDiagnostics = true;
-    public bool LogVerbose = false;
-    public float TickIntervalSeconds = 5.0f;
 }
 
 public sealed class HealthRegenSettings

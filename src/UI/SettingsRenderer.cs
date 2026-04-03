@@ -9,7 +9,6 @@ internal static class SettingsRenderer
     private enum SettingsTab
     {
         General,
-        Diagnostics,
         HealthRegen,
         ResourceRegen
     }
@@ -17,7 +16,6 @@ internal static class SettingsRenderer
     private static readonly string[] TabLabels =
     {
         "General",
-        "Diagnostics",
         "Health Regen",
         "Resource Regen"
     };
@@ -37,7 +35,6 @@ internal static class SettingsRenderer
     };
 
     private static SettingsTab currentTab;
-    private static string diagnosticsTickIntervalText;
     private static string healthTickIntervalText;
     private static string healthPerTickText;
     private static string resourceTickIntervalText;
@@ -79,9 +76,6 @@ internal static class SettingsRenderer
             case SettingsTab.General:
                 DrawGeneralTab(settings);
                 break;
-            case SettingsTab.Diagnostics:
-                DrawDiagnosticsTab(settings);
-                break;
             case SettingsTab.HealthRegen:
                 DrawHealthRegenTab(settings);
                 break;
@@ -107,25 +101,6 @@ internal static class SettingsRenderer
             settings.General.MirrorModLogsToGameLog,
             "Mirror mod messages to the in-game event log",
             "Copies this mod's own messages into Wrath's in-game event log window.");
-    }
-
-    private static void DrawDiagnosticsTab(ModSettings settings)
-    {
-        Section("Diagnostics");
-
-        settings.Diagnostics.EnablePartyDiagnostics = Toggle(
-            settings.Diagnostics.EnablePartyDiagnostics,
-            "Enable party diagnostics probe",
-            "Logs party composition, HP, and combat state at a fixed interval.");
-
-        settings.Diagnostics.TickIntervalSeconds = FloatField(
-            "Probe interval (seconds)",
-            diagnosticsTickIntervalText,
-            value => diagnosticsTickIntervalText = value,
-            settings.Diagnostics.TickIntervalSeconds,
-            0.5f,
-            3600f,
-            "How often the diagnostics probe runs. Allowed range: 0.5 to 3600 seconds.");
     }
 
     private static void DrawHealthRegenTab(ModSettings settings)
@@ -538,8 +513,6 @@ internal static class SettingsRenderer
         {
             case SettingsTab.General:
                 return "General settings control the mod-wide behavior shared by all features, including how much the mod logs.";
-            case SettingsTab.Diagnostics:
-                return "Diagnostics settings control whether the party probe runs and how often it samples game state.";
             case SettingsTab.HealthRegen:
                 return "Health Regen contains the current gameplay prototype. This is the tab that controls party, pet, summon, and undead handling.";
             case SettingsTab.ResourceRegen:
@@ -551,7 +524,6 @@ internal static class SettingsRenderer
 
     private static void EnsureTextCache(ModSettings settings)
     {
-        diagnosticsTickIntervalText ??= settings.Diagnostics.TickIntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         healthTickIntervalText ??= settings.HealthRegen.TickIntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);
         healthPerTickText ??= settings.HealthRegen.HealthPerTick.ToString(CultureInfo.InvariantCulture);
         resourceTickIntervalText ??= settings.ResourceRegen.TickIntervalSeconds.ToString("0.###", CultureInfo.InvariantCulture);

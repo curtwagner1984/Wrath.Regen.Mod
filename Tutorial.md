@@ -13,7 +13,7 @@ Build a small Unity Mod Manager mod for Pathfinder: Wrath of the Righteous that 
 - A minimal UMM mod project builds successfully.
 - The mod appears in the in-game mod manager.
 - The mod has a settings UI.
-- The mod runs an update loop through `OnUpdate`.
+- The mod runs gameplay ticking through Wrath's `IController` system.
 - The mod writes log output into the Unity Mod Manager log.
 
 ## Important Files
@@ -22,8 +22,8 @@ Build a small Unity Mod Manager mod for Pathfinder: Wrath of the Righteous that 
 - [Info.json](./Info.json)
 - [src/Main.cs](./src/Main.cs)
 - [src/ModSettings.cs](./src/ModSettings.cs)
-- [src/Features/Diagnostics/PartyProbeController.cs](./src/Features/Diagnostics/PartyProbeController.cs)
 - [src/Features/HealthRegen/HealthRegenController.cs](./src/Features/HealthRegen/HealthRegenController.cs)
+- [src/Features/ResourceRegen/ResourceRegenController.cs](./src/Features/ResourceRegen/ResourceRegenController.cs)
 - [src/UI/SettingsRenderer.cs](./src/UI/SettingsRenderer.cs)
 - [README.md](./README.md)
 
@@ -73,13 +73,13 @@ Unity Mod Manager writes logs to:
 
 Our current test messages include:
 
-- `PartyProbeController is running.`
 - `HealthRegenController is running. Prototype healing uses Wrath's built-in rule system.`
+- `ResourceRegenController is running. Prototype resource regeneration currently targets spellbooks, generic ability resources, and Kineticist burn.`
 
 This confirms:
 
 - the mod loads
-- the update loop is active
+- the controller-based tick path is active
 - our settings UI is connected
 
 ## What We Learned About Wrath Modding
@@ -306,13 +306,12 @@ We started splitting the mod into clearer areas so the later resource-regenerati
 Current structure:
 
 - `src/Infrastructure/ModLogger.cs`
-- `src/Features/Diagnostics/PartyProbeController.cs`
 - `src/Features/HealthRegen/HealthRegenController.cs`
+- `src/Features/ResourceRegen/ResourceRegenController.cs`
 - `src/UI/SettingsRenderer.cs`
 
 This lets us keep:
 
-- diagnostics separate from gameplay logic
 - feature code separate from infrastructure
 - UI rendering separate from mod entrypoint wiring
 - future spell/resource regeneration work in its own files/folder
@@ -324,8 +323,8 @@ The settings model is now split by responsibility instead of keeping all fields 
 Current sections:
 
 - `GeneralSettings`
-- `DiagnosticsSettings`
 - `HealthRegenSettings`
+- `ResourceRegenSettings`
 
 These are stored inside:
 
@@ -344,39 +343,14 @@ The UI is now rendered through:
 
 ## Current Development Strategy
 
-We are intentionally not jumping straight to “full regen logic.”
+We are intentionally not jumping straight to "full regen logic."
 
-Instead, we will use these steps:
+Instead, we use these steps:
 
-1. Confirm the game instance exists.
-2. Confirm a save is loaded.
-3. Read the party list.
-4. Log each unit’s name, HP, max HP, and combat state.
-5. Add a tiny out-of-combat-only regeneration effect.
-6. Add safety checks and settings.
-7. Expand carefully from there.
-
-## Progress Update
-
-We have now moved from a dummy tick logger to a real party snapshot logger.
-
-The current probe in [src/Features/Diagnostics/PartyProbeController.cs](./src/Features/Diagnostics/PartyProbeController.cs) is designed to:
-
-- wait until `Game.Instance` and `Game.Instance.Player` are available
-- read `Game.Instance.Player.Party`
-- log party size every interval
-- optionally log each party member in verbose mode
-
-The unit detail logger currently reads:
-
-- `UnitEntityData.CharacterName`
-- `UnitEntityData.Stats.HitPoints.ModifiedValue`
-- `UnitEntityData.MaxHP`
-- `UnitEntityData.CombatState.IsInCombat`
-- `UnitEntityData.State.IsDead`
-- `UnitEntityData.State.IsUnconscious`
-
-This is our first real runtime inspection pass over live game data.
+1. Confirm the relevant game systems and runtime APIs from local assemblies.
+2. Build small feature slices on top of Wrath's built-in rule and controller systems.
+3. Keep each feature configurable and testable in game.
+4. Expand carefully from there.
 
 ## Notes For Ourselves
 

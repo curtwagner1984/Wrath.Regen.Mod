@@ -1,9 +1,10 @@
 using System;
 using Kingmaker;
+using Kingmaker.Controllers;
 
 namespace WrathRegenMod;
 
-internal static class ResourceRegenController
+internal sealed class ResourceRegenController : IController
 {
     private static readonly IResourceRegenStrategy[] Strategies =
     {
@@ -13,67 +14,99 @@ internal static class ResourceRegenController
         new KineticistBurnRegenStrategy()
     };
 
-    private static float elapsedSeconds;
-    private static bool loggedReadyMessage;
+    private readonly ModRuntime runtime;
+    private float elapsedSeconds;
+    private bool loggedReadyMessage;
 
-    public static void Tick(ModLogger logger, ModSettings settings, float deltaTime)
+    public ResourceRegenController(ModRuntime runtime)
     {
-        if (!settings.ResourceRegen.Enabled)
+        this.runtime = runtime;
+    }
+
+    public void Activate()
+    {
+    }
+
+    public void Deactivate()
+    {
+        ResetAllStrategies();
+        loggedReadyMessage = false;
+    }
+
+    public void Tick()
+    {
+        if (!runtime.IsGameplayEnabled)
         {
             return;
         }
 
-        if (!loggedReadyMessage)
-        {
-            logger.Info("ResourceRegenController is running. Prototype resource regeneration currently targets spellbooks, generic ability resources, and Kineticist burn.");
-            loggedReadyMessage = true;
-        }
+        var settings = runtime.Settings;
+        var logger = runtime.Logger;
 
-        if (!Game.HasInstance || Game.Instance.Player == null)
+        try
         {
-            return;
-        }
-
-        elapsedSeconds += deltaTime;
-        if (elapsedSeconds < settings.ResourceRegen.TickIntervalSeconds)
-        {
-            return;
-        }
-
-        var tickElapsedSeconds = elapsedSeconds;
-        elapsedSeconds = 0f;
-
-        if (settings.ResourceRegen.OnlyRegenOutOfCombat && Game.Instance.Player.IsInCombat)
-        {
-            if (logger.IsVerbose)
-                logger.Verbose("Resource regeneration skipped because the party is in combat.");
-            return;
-        }
-
-        var context = new RegenTickContext(logger, settings, tickElapsedSeconds);
-        foreach (var unit in Game.Instance.Player.Party)
-        {
-            if (unit == null || !unit.IsInGame || unit.Suppressed || unit.IsDetached || !unit.IsPlayerFaction)
+            if (!settings.ResourceRegen.Enabled)
             {
-                continue;
+                return;
             }
 
-            foreach (var strategy in Strategies)
+            if (!loggedReadyMessage)
             {
-                try
+                logger.Info("ResourceRegenController is running. Prototype resource regeneration currently targets spellbooks, generic ability resources, and Kineticist burn.");
+                loggedReadyMessage = true;
+            }
+
+            if (!Game.HasInstance || Game.Instance.Player == null)
+            {
+                return;
+            }
+
+            elapsedSeconds += Game.Instance.TimeController.GameDeltaTime;
+            if (elapsedSeconds < settings.ResourceRegen.TickIntervalSeconds)
+            {
+                return;
+            }
+
+            var tickElapsedSeconds = elapsedSeconds;
+            elapsedSeconds = 0f;
+
+            if (settings.ResourceRegen.OnlyRegenOutOfCombat && Game.Instance.Player.IsInCombat)
+            {
+                if (logger.IsVerbose)
+                    logger.Verbose("Resource regeneration skipped because the party is in combat.");
+                return;
+            }
+
+            var context = new RegenTickContext(logger, settings, tickElapsedSeconds);
+            foreach (var unit in Game.Instance.Player.Party)
+            {
+                if (unit == null || !unit.IsInGame || unit.Suppressed || unit.IsDetached || !unit.IsPlayerFaction)
                 {
-                    strategy.Tick(unit, context);
+                    continue;
                 }
-                catch (Exception ex)
+
+                foreach (var strategy in Strategies)
                 {
-                    if (logger.IsError)
-                        logger.Error($"{strategy.Name} failed for {GetUnitName(unit)}: {ex}");
+                    try
+                    {
+                        strategy.Tick(unit, context);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (logger.IsError)
+                            logger.Error($"{strategy.Name} failed for {GetUnitName(unit)}: {ex}");
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            if (logger.IsError)
+                logger.Error($"Unhandled exception in resource regeneration controller: {ex}");
         }
     }
 
-    public static void ResetAllStrategies()
+    public void ResetAllStrategies()
     {
         foreach (var strategy in Strategies)
         {

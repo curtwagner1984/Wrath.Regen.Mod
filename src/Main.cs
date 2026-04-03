@@ -1,5 +1,4 @@
 using HarmonyLib;
-using Kingmaker;
 using Kingmaker.GameModes;
 using Kingmaker.PubSubSystem;
 using UnityModManagerNet;
@@ -8,27 +7,34 @@ namespace WrathRegenMod;
 
 public static class Main
 {
-    private static UnityModManager.ModEntry modEntry;
-    private static Harmony harmony;
-    private static ModSettings settings;
-    private static SettingsSnapshot lastSavedSnapshot;
-    private static ModLogger logger;
-    private static ResourceRegenAreaHandler areaHandler;
+    private static UnityModManager.ModEntry _modEntry;
+    private static Harmony _harmony;
+    private static ModSettings _settings;
+    private static SettingsSnapshot _lastSavedSnapshot;
+    private static ModLogger _logger;
+    private static ModRuntime _runtime;
+    private static HealthRegenController _healthRegenController;
+    private static ResourceRegenController _resourceRegenController;
+    private static ResourceRegenAreaHandler _areaHandler;
+    private static bool _controllersRegistered;
 
     public static bool Load(UnityModManager.ModEntry entry)
     {
-        modEntry = entry;
-        settings = UnityModManager.ModSettings.Load<ModSettings>(entry);
-        logger = new ModLogger(modEntry, settings);
-        harmony = new Harmony(entry.Info.Id);
-        lastSavedSnapshot = SettingsSnapshot.Capture(settings);
+        _modEntry = entry;
+        _settings = UnityModManager.ModSettings.Load<ModSettings>(entry);
+        _logger = new ModLogger(_modEntry, _settings);
+        _runtime = new ModRuntime(_settings, _logger);
+        _runtime.SetModEnabled(entry.Enabled);
+        _healthRegenController = new HealthRegenController(_runtime);
+        _resourceRegenController = new ResourceRegenController(_runtime);
+        _harmony = new Harmony(entry.Info.Id);
+        _lastSavedSnapshot = SettingsSnapshot.Capture(_settings);
 
         entry.OnToggle = OnToggle;
         entry.OnGUI = OnGUI;
         entry.OnSaveGUI = OnSaveGUI;
-        entry.OnUpdate = OnUpdate;
 
-        logger.Info("Wrath Regen Mod loaded.");
+        _logger.Info("Wrath Regen Mod loaded.");
         return true;
     }
 
@@ -36,82 +42,76 @@ public static class Main
     {
         if (value)
         {
-            harmony.PatchAll();
-            areaHandler = new ResourceRegenAreaHandler();
-            EventBus.Subscribe(areaHandler);
-            logger.Info("Wrath Regen Mod enabled.");
+            _runtime.SetModEnabled(true);
+            _harmony.PatchAll();
+            TryRegisterControllers();
+            _areaHandler = new ResourceRegenAreaHandler(_resourceRegenController);
+            EventBus.Subscribe(_areaHandler);
+            _logger.Info("Wrath Regen Mod enabled.");
         }
         else
         {
-            harmony.UnpatchAll(entry.Info.Id);
-            if (areaHandler != null)
+            _runtime.SetModEnabled(false);
+            _healthRegenController.Deactivate();
+            _resourceRegenController.Deactivate();
+            _harmony.UnpatchAll(entry.Info.Id);
+            if (_areaHandler != null)
             {
-                EventBus.Unsubscribe(areaHandler);
-                areaHandler = null;
+                EventBus.Unsubscribe(_areaHandler);
+                _areaHandler = null;
             }
-            logger.Info("Wrath Regen Mod disabled.");
+            _logger.Info("Wrath Regen Mod disabled.");
         }
 
         return true;
     }
 
+    internal static void TryRegisterControllers()
+    {
+        if (_controllersRegistered)
+        {
+            return;
+        }
+
+        if (_healthRegenController == null || _resourceRegenController == null)
+        {
+            return;
+        }
+
+        if (GameModesFactory.AllControllers == null || GameModesFactory.AllControllers.Count == 0)
+        {
+            return;
+        }
+
+        GameModesFactory.Register(_healthRegenController, GameModeType.Default);
+        GameModesFactory.Register(_resourceRegenController, GameModeType.Default);
+        _controllersRegistered = true;
+    }
+
+    internal static void ResetControllerRegistration()
+    {
+        _controllersRegistered = false;
+    }
+
     private static void OnGUI(UnityModManager.ModEntry entry)
     {
-        SettingsRenderer.Draw(settings);
+        SettingsRenderer.Draw(_settings);
     }
 
     private static void OnSaveGUI(UnityModManager.ModEntry entry)
     {
-        var logger = GetLogger();
-        var currentSnapshot = SettingsSnapshot.Capture(settings);
+        var currentSnapshot = SettingsSnapshot.Capture(_settings);
 
-        settings.Save(entry);
-        foreach (var change in currentSnapshot.DescribeChanges(lastSavedSnapshot))
+        _settings.Save(entry);
+        foreach (var change in currentSnapshot.DescribeChanges(_lastSavedSnapshot))
         {
-            logger.Info($"Configuration changed: {change}");
+            if (_logger.IsInfo)
+            {
+                _logger.Info($"Configuration changed: {change}");
+            }
         }
 
-        lastSavedSnapshot = currentSnapshot;
+        _lastSavedSnapshot = currentSnapshot;
     }
 
-    private static void OnUpdate(UnityModManager.ModEntry entry, float deltaTime)
-    {
-        if (!entry.Enabled || !settings.General.Enabled)
-        {
-            return;
-        }
-
-        if (!Game.HasInstance || Game.Instance.Player == null)
-        {
-            return;
-        }
-
-        if (Game.Instance.IsPaused || Game.Instance.IsFakePause)
-        {
-            return;
-        }
-
-        if (Game.Instance.CurrentMode != GameModeType.Default)
-        {
-            return;
-        }
-
-        var logger = GetLogger();
-        try
-        {
-            PartyProbeController.Tick(logger, settings, deltaTime);
-            HealthRegenController.Tick(logger, settings, deltaTime);
-            ResourceRegenController.Tick(logger, settings, deltaTime);
-        }
-        catch (System.Exception ex)
-        {
-            if (logger.IsError)
-                logger.Error($"Unhandled exception in update loop: {ex}");
-        }
-    }
-
-    private static ModLogger GetLogger()
-    {
-        return logger;
-    }
 }
