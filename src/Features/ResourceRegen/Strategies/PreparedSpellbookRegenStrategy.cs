@@ -50,7 +50,7 @@ internal sealed class PreparedSpellbookRegenStrategy : IResourceRegenStrategy
 
     private void TickSpellbook(UnitEntityData unit, Spellbook spellbook, RegenTickContext context)
     {
-        for (var spellLevel = 1; spellLevel <= 9; spellLevel++)
+        for (var spellLevel = 1; spellLevel <= spellbook.Blueprint.MaxSpellLevel; spellLevel++)
         {
             var intervalSeconds = context.Settings.ResourceRegen.GetIntervalSecondsForSpellLevel(spellLevel);
             if (intervalSeconds <= 0f)
