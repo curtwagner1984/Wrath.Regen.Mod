@@ -149,14 +149,14 @@ internal static class HealthRegenController
 
     private static IEnumerable<UnitEntityData> GetConfiguredTargets(ModSettings settings)
     {
-        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var seen = new HashSet<UnitEntityData>();
         var baseTargets = settings.HealthRegen.IncludePets
             ? Game.Instance.Player.PartyAndPets
             : Game.Instance.Player.Party;
 
         foreach (var unit in baseTargets)
         {
-            if (ShouldInclude(unit) && seen.Add(unit.UniqueId))
+            if (ShouldInclude(unit) && seen.Add(unit))
             {
                 yield return unit;
             }
@@ -169,7 +169,7 @@ internal static class HealthRegenController
 
         foreach (var unit in Game.Instance.Player.AllCrossSceneUnits)
         {
-            if (ShouldIncludeSummon(unit) && seen.Add(unit.UniqueId))
+            if (ShouldIncludeSummon(unit) && !seen.Contains(unit))
             {
                 yield return unit;
             }
