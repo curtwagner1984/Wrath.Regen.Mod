@@ -96,7 +96,7 @@ public sealed class ResourceRegenSettings
             case 9:
                 return Level9IntervalSeconds;
             default:
-                return 0f;
+                return spellLevel > 9 ? Level9IntervalSeconds : 0f;
         }
     }
 
