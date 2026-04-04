@@ -23,10 +23,20 @@ internal sealed class HealthRegenController : IController
 
     public void Activate()
     {
+        if (runtime.Logger.IsVerbose)
+            runtime.Logger.Verbose("Activate was called on HealthRegenController.");
     }
 
     public void Deactivate()
     {
+        if (runtime.Logger.IsVerbose)
+            runtime.Logger.Verbose("Deactivate was called on HealthRegenController.");
+    }
+
+    public void ResetState()
+    {
+        if (runtime.Logger.IsVerbose)
+            runtime.Logger.Verbose("ResetState was called on HealthRegenController.");
         elapsedSeconds = 0f;
         loggedReadyMessage = false;
     }
@@ -50,7 +60,7 @@ internal sealed class HealthRegenController : IController
             if (!loggedReadyMessage)
             {
                 if(logger.IsInfo)
-                    logger.Info("HealthRegenController is running. Prototype healing uses Wrath's built-in rule system.");
+                    logger.Info("HealthRegenController is active. Health regeneration uses Wrath's built-in rule system.");
                 loggedReadyMessage = true;
             }
 
@@ -70,7 +80,7 @@ internal sealed class HealthRegenController : IController
             if (settings.HealthRegen.OnlyRegenOutOfCombat && Game.Instance.Player.IsInCombat)
             {
                 if (logger.IsVerbose)
-                    logger.Verbose("Health prototype skipped because the party is in combat.");
+                    logger.Verbose("Health regeneration skipped because the party is in combat.");
                 return;
             }
 
@@ -99,14 +109,14 @@ internal sealed class HealthRegenController : IController
         if (eligibleUnits == 0)
         {
             if (logger.IsVerbose)
-                logger.Verbose("Health prototype skipped because no eligible units were available.");
+                logger.Verbose("Health regeneration skipped because no eligible units were available.");
             return;
         }
 
         if (healedUnits == 0)
         {
             if (logger.IsVerbose)
-                logger.Verbose("Health prototype found no party members who needed healing.");
+                logger.Verbose("Health regeneration found no party members who needed healing.");
         }
     }
 
@@ -147,7 +157,7 @@ internal sealed class HealthRegenController : IController
         if (healRule.Value <= 0)
         {
             if (logger.IsVerbose)
-                logger.Verbose($"Health prototype attempted to heal {name}, but no HP was restored.");
+                logger.Verbose($"Health regeneration attempted to heal {name}, but no HP was restored.");
             return false;
         }
 
@@ -171,7 +181,7 @@ internal sealed class HealthRegenController : IController
         if (restored <= 0)
         {
             if (logger.IsVerbose)
-                logger.Verbose($"Health prototype attempted undead restoration on {name}, but no HP was restored.");
+                logger.Verbose($"Health regeneration attempted undead restoration on {name}, but no HP was restored.");
             return false;
         }
 

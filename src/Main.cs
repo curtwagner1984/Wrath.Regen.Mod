@@ -45,15 +45,15 @@ public static class Main
             _runtime.SetModEnabled(true);
             _harmony.PatchAll();
             TryRegisterControllers();
-            _areaHandler = new ResourceRegenAreaHandler(_resourceRegenController);
+            _areaHandler = new ResourceRegenAreaHandler(_healthRegenController, _resourceRegenController);
             EventBus.Subscribe(_areaHandler);
             _logger.Info("Wrath Regen Mod enabled.");
         }
         else
         {
             _runtime.SetModEnabled(false);
-            _healthRegenController.Deactivate();
-            _resourceRegenController.Deactivate();
+            _healthRegenController.ResetState();
+            _resourceRegenController.ResetState();
             _harmony.UnpatchAll(entry.Info.Id);
             if (_areaHandler != null)
             {

@@ -25,10 +25,20 @@ internal sealed class ResourceRegenController : IController
 
     public void Activate()
     {
+        if (runtime.Logger.IsVerbose)
+            runtime.Logger.Verbose("Activate was called on ResourceRegenController.");
     }
 
     public void Deactivate()
     {
+        if (runtime.Logger.IsVerbose)
+            runtime.Logger.Verbose("Deactivate was called on ResourceRegenController.");
+    }
+
+    public void ResetState()
+    {
+        if (runtime.Logger.IsVerbose)
+            runtime.Logger.Verbose("ResetState was called on ResourceRegenController.");
         ResetAllStrategies();
         loggedReadyMessage = false;
     }
@@ -52,7 +62,7 @@ internal sealed class ResourceRegenController : IController
 
             if (!loggedReadyMessage)
             {
-                logger.Info("ResourceRegenController is running. Prototype resource regeneration currently targets spellbooks, generic ability resources, and Kineticist burn.");
+                logger.Info("ResourceRegenController is active. Resource regeneration currently targets spellbooks, generic ability resources, and Kineticist burn.");
                 loggedReadyMessage = true;
             }
 
